@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>index</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+   var mathElements = document.getElementsByClassName("math");
+   var macros = [];
+   for (var i = 0; i < mathElements.length; i++) {
+    var texText = mathElements[i].firstChild;
+    if (mathElements[i].tagName == "SPAN") {
+     katex.render(texText.data, mathElements[i], {
+      displayMode: mathElements[i].classList.contains('display'),
+      throwOnError: false,
+      macros: macros,
+      fleqn: false
+     });
+  }}});
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<h1 id="supervised-learning-cheat-sheet">Supervised Learning cheat sheet</h1>
+<h2 id="data-representation">Data representation</h2>
+<h2 id="discriminative-problems">Discriminative problems</h2>
+<h3 id="parametrics-models-glm-svm">Parametrics Models (GLM, SVM…)</h3>
+<h4 id="loss-and-risk-functions">Loss and risk functions</h4>
+<p><span class="math display">
+\min_w \frac{1}{n} \sum_{i=1}^{n} l ( f_w(x_i), y_i ) + \lambda C(w)
+</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">l</span> is a loss function</li>
+<li><span class="math inline">f_w</span> is the prediction function (<span class="math inline">w</span> is the parameter to optimize)</li>
+<li><span class="math inline">C</span> is a regularization function and <span class="math inline">\lambda</span> a regularization factor</li>
+</ul>
+<p>Here the model are linear, <span class="math inline">f_w(x) = w^Tx</span>, and for a given dataset in <span class="math inline">\mathcal{X}\times\mathcal{Y}</span>, <span class="math inline">\phi_i(\cdot) = l ( \cdot, y_i )</span>: We can apply Fenchel duality and we have:</p>
+<table>
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 62%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Primal</th>
+<th>Dual</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\min_w \frac{1}{n} \sum_{i=1}^{n} \phi_i(w^Tx_i) + C(w)</span></td>
+<td><span class="math inline">\max_\alpha \frac{1}{n} \sum_{i=1}^{n} -\phi_i^*(-\alpha_i ) - C^*(\sum_{i=1}^{n} \alpha_i x_i)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Where <span class="math inline">\phi_i^*</span> and <span class="math inline">C^*</span> are the convex conjugate of <span class="math inline">\phi_i</span> and <span class="math inline">C</span> (defined by <span class="math inline">f^*(a) = \max_z (za - f(z))</span>). And <span class="math inline">x_i^*(\cdot)</span> is the adjoint operator of <span class="math inline">(\cdot^Tx_i)</span> (<span class="math inline">{w^T}^* = \overline{w}</span>)</p>
+<p>It can be shown that if <span class="math inline">\hat{w}</span> and <span class="math inline">\hat{\alpha}</span> are the optimal solutions of those problems, then we have: <span class="math display">
+P(\hat{w}) = P(w(\hat{\alpha})) = D(\hat{\alpha})
+</span></p>
+<h4 id="loss-functions-and-corresponding-problems">Loss functions and corresponding problems:</h4>
+<table>
+<colgroup>
+<col style="width: 8%" />
+<col style="width: 14%" />
+<col style="width: 41%" />
+<col style="width: 35%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th><span class="math inline">l(x,y)</span></th>
+<th><span class="math inline">l^*(-a,y)</span></th>
+<th>problem</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">L^2</span></td>
+<td><span class="math inline">(x-y)^2</span></td>
+<td><span class="math inline">-ay + \frac{a^2}{4}</span></td>
+<td>linear regression (GLM normal, SVM regressor)</td>
+</tr>
+<tr class="even">
+<td>Logistic</td>
+<td><span class="math inline">\ln(1+e^{-xy})</span></td>
+<td><span class="math inline">ay_i\ln(ay) + (1-ay)\ln(1-ay)</span>, <span class="math inline">ay \in [0,1]</span></td>
+<td>logistic regression (GLM bernoulli)</td>
+</tr>
+<tr class="odd">
+<td>Hinge loss</td>
+<td><span class="math inline">\max(0,1-xy)</span></td>
+<td><span class="math inline">-ay</span>, <span class="math inline">ay \in [0,1]</span></td>
+<td>classification (SVM)</td>
+</tr>
+</tbody>
+</table>
+<p>Regularizations:</p>
+<ul>
+<li><span class="math inline">L^2</span>: <span class="math inline">C(w) = ||w||^2_2</span></li>
+<li><span class="math inline">L^1</span>: <span class="math inline">C(w) = ||w||_1</span></li>
+</ul>
+<h4 id="the-kernel-trick-for-non-linear-models">The kernel trick for non-linear models</h4>
+<p>kernels</p>
+<h4 id="solvers">Solvers</h4>
+<p>Descent methods</p>
+<table>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>type</th>
+<th>update rule</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Gradient Descent</td>
+<td>primal</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>SGD</td>
+<td>primal</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>SDCA</td>
+<td>primal-dual</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>SAG</td>
+<td>primal</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>SMO</td>
+<td>dual</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Newton</td>
+<td>primal</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>BFGS</td>
+<td>primal</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="non-parametric-models">Non parametric models</h3>
+<p>kNN decision trees random forests Maximum-entropy Markov models</p>
+<h2 id="problems">Problems</h2>
+<p>test</p>
+<h3 id="regression">Regression</h3>
+<p>test</p>
+<h3 id="classification">Classification</h3>
+<p>test</p>
+</body>
+</html>
