@@ -1,3 +1,4 @@
 #! /bin/bash
 
-pandoc docs/index.md -f markdown -t html -s --katex -o index.html -c style.css
+rm plots/*
+pandoc docs/index.md -s --filter pandoc-plot --katex -o index.html -c style.css --toc

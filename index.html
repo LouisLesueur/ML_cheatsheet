@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>index</title>
+  <title>Supervised learning - synthesis</title>
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -35,21 +35,134 @@
   <![endif]-->
 </head>
 <body>
-<h1 id="supervised-learning-cheat-sheet">Supervised Learning cheat sheet</h1>
+<header id="title-block-header">
+<h1 class="title">Supervised learning - synthesis</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#data-representation">Data representation</a></li>
+<li><a href="#discriminative-problems">Discriminative problems</a>
+<ul>
+<li><a href="#loss-and-risk-functions">Loss and risk functions</a></li>
+<li><a href="#maximum-likelihood-principle">Maximum Likelihood principle</a></li>
+<li><a href="#loss-functions-and-corresponding-problems">Loss functions and corresponding problems:</a></li>
+<li><a href="#non-parametric-models">Non parametric models</a></li>
+</ul></li>
+<li><a href="#bibliography">Bibliography</a></li>
+</ul>
+</nav>
 <h2 id="data-representation">Data representation</h2>
+<ul>
+<li>pre treatment</li>
+<li>missing data</li>
+<li>defining a metric (cf LMNN DM)</li>
+</ul>
 <h2 id="discriminative-problems">Discriminative problems</h2>
-<h3 id="parametrics-models-glm-svm">Parametrics Models (GLM, SVM…)</h3>
-<h4 id="loss-and-risk-functions">Loss and risk functions</h4>
+<h3 id="loss-and-risk-functions">Loss and risk functions</h3>
+<p>Goal of a machine learning algorthm: find function <span class="math inline">f</span> that can predict new values with the best accuracy.</p>
+<ul>
+<li>Loss function <span class="math inline">L(y,y_{pred})</span>: measure the error of the predictor.</li>
+<li>Risk function <span class="math inline">R(f) = \mathbb{E}_{XY}(L(Y,f(X)))</span></li>
+<li>Empirical risk function <span class="math inline">R_{emp}(f) = \frac{1}{n} \sum_i L(y_i, f(x_i))</span></li>
+</ul>
+<p>The problem real solution is <span class="math display">
+f^* = \arg \min_f R(f)
+</span></p>
+<p>To solve the problem, we chose a restricted set of possible function <span class="math inline">\mathcal{F}</span> (either parametric model, either not). We note: <span class="math display">
+\tilde{f} = \arg \min_{f \in \mathcal{F}} R(f)
+</span></p>
+<p>As we only have a sample <span class="math inline">\mathcal{D_n}</span> of the distribution <span class="math inline">p_{XY}</span>, which is unknown, in practise we compute: <span class="math display">
+\hat{f} = \arg \min_{f \in \mathcal{F}} R_{emp}(f)
+</span></p>
+<p>Errors:</p>
+<ul>
+<li>approximation: <span class="math inline">f^*-\tilde{f}</span></li>
+<li>estimation: <span class="math inline">\tilde{f}-\hat{f}</span></li>
+<li>total: <span class="math inline">f^* - \hat{f}</span></li>
+</ul>
+<h3 id="maximum-likelihood-principle">Maximum Likelihood principle</h3>
+<p>In Machine Learning, most of the time we make assumption on data:</p>
 <p><span class="math display">
-\min_w \frac{1}{n} \sum_{i=1}^{n} l ( f_w(x_i), y_i ) + \lambda C(w)
+y = f_\theta(x) + \epsilon
+</span></p>
+<p>with <span class="math inline">\epsilon</span> iid zero mean noise.</p>
+<p>So : <span class="math inline">y \sim F(f_\theta(x))</span></p>
+<p>Let <span class="math inline">p_\theta</span> be the estimated parametric distribution of <span class="math inline">y|x</span>, then its log-likelihood is defined by:</p>
+<p><span class="math display">
+\mathcal{L}(f_\theta) = \sum_{i=0}^n \log{p_\theta(y|x)}
+</span></p>
+<p>The corresponding MLE estimator is: <span class="math inline">\hat{f_\theta} = \arg \max_{\theta} \mathcal{L(f_\theta)}</span></p>
+<p>MLE can be seen as a particular case of risk minimization, with <span class="math inline">L(f_\theta(x), y)=-\log{p_\theta(y|x)}</span> (for a <span class="math inline">L^2</span> loss, with a linear model and a normal error, the Least-square model naturally appears). And we have:</p>
+<p><span class="math display">
+R_{emp}(f_\theta) = - \frac{1}{n} \sum_{i=0}^n \log{p_\theta(y_i|x)}
+</span></p>
+<p><span class="math display">
+R(f_\theta) = \mathbb{E}(-\log{p_\theta(Y|x)})
+</span></p>
+<p><span class="math display">
+R(f_\theta) - R(f^*) = \text{KL}(p_\theta, p^*)
+</span></p>
+<h4 id="glm-generalized-linear-models">GLM (Generalized Linear Models)</h4>
+<p>General linear models are defined by the following assumptions on data:</p>
+<ul>
+<li>Exponential family (cf table): <span class="math inline">p_\theta(y|x, \theta) = b(y) \exp{\eta T(y) - a(\eta)}</span></li>
+<li><span class="math inline">f_\theta(x) = \mathbb{E}(y|x, \theta)</span></li>
+<li><span class="math inline">\eta = \theta^Tx</span></li>
+</ul>
+<table>
+<thead>
+<tr class="header">
+<th>Distribution</th>
+<th><span class="math inline">\eta</span></th>
+<th><span class="math inline">T(y)</span></th>
+<th><span class="math inline">a(\eta)</span></th>
+<th><span class="math inline">b(y)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Bernoulli</td>
+<td><span class="math inline">\log{\frac{\phi}{1-\phi}}</span></td>
+<td>y</td>
+<td><span class="math inline">\log(1+e^{\eta})</span></td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>Gaussian</td>
+<td><span class="math inline">\mu</span></td>
+<td>y</td>
+<td><span class="math inline">\frac{\eta^2}{2}</span></td>
+<td><span class="math inline">\frac{1}{\sqrt{2\pi}} \exp(\frac{-y^2}{2})</span></td>
+</tr>
+<tr class="odd">
+<td>Poisson</td>
+<td><span class="math inline">\log{\lambda}</span></td>
+<td>y</td>
+<td><span class="math inline">\exp{\eta}</span></td>
+<td><span class="math inline">\frac{1}{y!}</span></td>
+</tr>
+<tr class="even">
+<td>Geometric</td>
+<td><span class="math inline">\log{1-\phi}</span></td>
+<td>y</td>
+<td><span class="math inline">\log \frac{e^\eta}{1-e^\eta}</span></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h4 id="loss-minimization">Loss minimization</h4>
+<p>So, minimizing the risk (or maximizing the likelihood) often leads to a problem of the form:</p>
+<p><span class="math display">
+\min_\theta \frac{1}{n} \sum_{i=1}^{n} L( f_\theta(x_i), y_i ) + \lambda C(\theta)
 </span></p>
 <p>where:</p>
 <ul>
-<li><span class="math inline">l</span> is a loss function</li>
-<li><span class="math inline">f_w</span> is the prediction function (<span class="math inline">w</span> is the parameter to optimize)</li>
+<li><span class="math inline">L</span> is a loss function</li>
+<li><span class="math inline">f_\theta</span> is the prediction function (<span class="math inline">\theta</span> is the parameter to optimize)</li>
 <li><span class="math inline">C</span> is a regularization function and <span class="math inline">\lambda</span> a regularization factor</li>
 </ul>
-<p>Here the model are linear, <span class="math inline">f_w(x) = w^Tx</span>, and for a given dataset in <span class="math inline">\mathcal{X}\times\mathcal{Y}</span>, <span class="math inline">\phi_i(\cdot) = l ( \cdot, y_i )</span>: We can apply Fenchel duality and we have:</p>
+<h5 id="linear-case">Linear case</h5>
+<p>Here the model are linear, <span class="math inline">f_\theta(x) = \theta^Tx</span>. For this kind of mdel, Fenchel duality can be used to simply express the dual problem, which can be exploited for the kernel trick.</p>
 <table>
 <colgroup>
 <col style="width: 37%" />
@@ -63,60 +176,63 @@
 </thead>
 <tbody>
 <tr class="odd">
-<td><span class="math inline">\min_w \frac{1}{n} \sum_{i=1}^{n} \phi_i(w^Tx_i) + C(w)</span></td>
-<td><span class="math inline">\max_\alpha \frac{1}{n} \sum_{i=1}^{n} -\phi_i^*(-\alpha_i ) - C^*(\sum_{i=1}^{n} \alpha_i x_i)</span></td>
+<td><span class="math inline">\min_\theta \frac{1}{n} \sum_{i=1}^{n} L(y_i, \theta^Tx_i) + C(\theta)</span></td>
+<td><span class="math inline">\max_\alpha \frac{1}{n} \sum_{i=1}^{n} -L^*(y_i,-\alpha_i ) - C^*(\sum_{i=1}^{n} \alpha_i x_i)</span></td>
 </tr>
 </tbody>
 </table>
-<p>Where <span class="math inline">\phi_i^*</span> and <span class="math inline">C^*</span> are the convex conjugate of <span class="math inline">\phi_i</span> and <span class="math inline">C</span> (defined by <span class="math inline">f^*(a) = \max_z (za - f(z))</span>). And <span class="math inline">x_i^*(\cdot)</span> is the adjoint operator of <span class="math inline">(\cdot^Tx_i)</span> (<span class="math inline">{w^T}^* = \overline{w}</span>)</p>
-<p>It can be shown that if <span class="math inline">\hat{w}</span> and <span class="math inline">\hat{\alpha}</span> are the optimal solutions of those problems, then we have: <span class="math display">
-P(\hat{w}) = P(w(\hat{\alpha})) = D(\hat{\alpha})
+<p>Where <span class="math inline">L^*</span> and <span class="math inline">C^*</span> are the convex conjugate of <span class="math inline">L</span> (for the second variable) and <span class="math inline">C</span> (defined by <span class="math inline">f^*(a) = \max_z (za - f(z))</span>). And <span class="math inline">x_i^*(\cdot)</span> is the adjoint operator of <span class="math inline">(\cdot^Tx_i)</span> (<span class="math inline">{\theta^T}^* = \overline{\theta}</span>)</p>
+<p>It can be shown that if <span class="math inline">\hat{\theta}</span> and <span class="math inline">\hat{\alpha}</span> are the optimal solutions of those problems, then we have: <span class="math display">
+P(\hat{\theta}) = P(\theta(\hat{\alpha})) = D(\hat{\alpha})
 </span></p>
-<h4 id="loss-functions-and-corresponding-problems">Loss functions and corresponding problems:</h4>
+<h4 id="the-kernel-trick-for-non-linear-models">The kernel trick for non-linear models</h4>
+<p>kernels</p>
+<h3 id="loss-functions-and-corresponding-problems">Loss functions and corresponding problems:</h3>
+<h4 id="binary-classification">Binary classification</h4>
 <table>
-<colgroup>
-<col style="width: 8%" />
-<col style="width: 14%" />
-<col style="width: 41%" />
-<col style="width: 35%" />
-</colgroup>
 <thead>
 <tr class="header">
 <th>Name</th>
-<th><span class="math inline">l(x,y)</span></th>
-<th><span class="math inline">l^*(-a,y)</span></th>
-<th>problem</th>
+<th><span class="math inline">L(y,x)</span></th>
+<th><span class="math inline">L^*(y,-a)</span></th>
+<th>properties</th>
+<th>comments</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><span class="math inline">L^2</span></td>
-<td><span class="math inline">(x-y)^2</span></td>
-<td><span class="math inline">-ay + \frac{a^2}{4}</span></td>
-<td>linear regression (GLM normal, SVM regressor)</td>
-</tr>
-<tr class="even">
-<td>Logistic</td>
-<td><span class="math inline">\ln(1+e^{-xy})</span></td>
-<td><span class="math inline">ay_i\ln(ay) + (1-ay)\ln(1-ay)</span>, <span class="math inline">ay \in [0,1]</span></td>
-<td>logistic regression (GLM bernoulli)</td>
-</tr>
-<tr class="odd">
-<td>Hinge loss</td>
-<td><span class="math inline">\max(0,1-xy)</span></td>
-<td><span class="math inline">-ay</span>, <span class="math inline">ay \in [0,1]</span></td>
-<td>classification (SVM)</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
 </tr>
 </tbody>
 </table>
+<h4 id="multilabel-classification">Multilabel classification</h4>
+<h4 id="regression">Regression</h4>
+<table>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th><span class="math inline">L(y,x)</span></th>
+<th><span class="math inline">L^*(y,-a)</span></th>
+<th>properties</th>
+<th>comments</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+<figure>
+<img src="plots/14908206134350492076.png" />
+</figure>
 <p>Regularizations:</p>
 <ul>
 <li><span class="math inline">L^2</span>: <span class="math inline">C(w) = ||w||^2_2</span></li>
 <li><span class="math inline">L^1</span>: <span class="math inline">C(w) = ||w||_1</span></li>
 </ul>
-<h4 id="the-kernel-trick-for-non-linear-models">The kernel trick for non-linear models</h4>
-<p>kernels</p>
-<h4 id="solvers">Solvers</h4>
+<h4 id="algorithms-to-solve-the-minimization-problem">Algorithms to solve the minimization problem</h4>
 <p>Descent methods</p>
 <table>
 <thead>
@@ -166,11 +282,9 @@ P(\hat{w}) = P(w(\hat{\alpha})) = D(\hat{\alpha})
 </table>
 <h3 id="non-parametric-models">Non parametric models</h3>
 <p>kNN decision trees random forests Maximum-entropy Markov models</p>
-<h2 id="problems">Problems</h2>
-<p>test</p>
-<h3 id="regression">Regression</h3>
-<p>test</p>
-<h3 id="classification">Classification</h3>
-<p>test</p>
+<h1 id="bibliography">Bibliography</h1>
+<ul>
+<li>Rosasco, Lorenzo &amp; De Vito, Ernesto &amp; Caponnetto, Andrea &amp; Piana, Michele &amp; Verri, Alessandro. (2004). Are Loss Functions All the Same?. Neural computation. 16. 1063-76. 10.1162/089976604773135104.</li>
+</ul>
 </body>
 </html>

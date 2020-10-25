@@ -9,10 +9,10 @@ Description: Github README style. Includes theme for Pygmentized code blocks.
 */
 html, body {
   color: black;
-  padding-left: 50px;
-  padding-right: 50px;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding-left: 10%;
+  padding-right: 10%;
+  padding-top: 5%;
+  padding-bottom: 5%;
 }
 
 *:not('#mkdbuttons') {
