@@ -1,67 +1,47 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
-<head>
-  <meta charset="utf-8" />
-  <meta name="generator" content="pandoc" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="author" content="Louis Lesueur" />
-  <title>Machine learning - synthesis</title>
-  <style>
-    code{white-space: pre-wrap;}
-    span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
-    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
-  </style>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.js"></script>
-  <script>document.addEventListener("DOMContentLoaded", function () {
-   var mathElements = document.getElementsByClassName("math");
-   var macros = [];
-   for (var i = 0; i < mathElements.length; i++) {
-    var texText = mathElements[i].firstChild;
-    if (mathElements[i].tagName == "SPAN") {
-     katex.render(texText.data, mathElements[i], {
-      displayMode: mathElements[i].classList.contains('display'),
-      throwOnError: false,
-      macros: macros,
-      fleqn: false
-     });
-  }}});
-  </script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" />
-  <!--[if lt IE 9]>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
-  <![endif]-->
-</head>
-<body>
-<header id="title-block-header">
-<h1 class="title">Machine learning - synthesis</h1>
-<p class="author">Louis Lesueur</p>
-</header>
-<nav id="TOC" role="doc-toc">
-<ul>
-<li><a href="#data-representation">Data representation</a>
-<ul>
-<li><a href="#definitions">Definitions</a></li>
-<li><a href="#pre-treatments">Pre-treatments</a></li>
-<li><a href="#handling-missing-data">Handling missing data</a></li>
-<li><a href="#dimensionality-reduction">Dimensionality reduction</a></li>
-</ul></li>
-<li><a href="#discriminative-problems">Discriminative problems</a>
-<ul>
-<li><a href="#loss-and-risk-functions">Loss and risk functions</a></li>
-<li><a href="#parametric-models">Parametric models</a></li>
-<li><a href="#non-parametric-models">Non parametric models</a></li>
-</ul></li>
-<li><a href="#neural-networks">Neural networks</a></li>
-<li><a href="#generative-problems">Generative Problems</a></li>
-<li><a href="#model-validation">Model validation</a></li>
-<li><a href="#learning-algorithm-selection">Learning algorithm selection</a></li>
-</ul>
-</nav>
-<h2 id="data-representation">Data representation</h2>
+<!doctype html>
+<html>
+   <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <meta name="generator" content="pandoc">
+      <meta name="author" content="Louis Lesueur">
+      
+      <title>Machine learning - synthesis</title>
+      <!-- Bootstrap -->
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+      <!-- Font-awesome -->
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+      <!-- Styles -->
+      <link rel="stylesheet" href="https://ashki23.github.io/styles.css">
+            <!-- Add favicon here -->
+            <!-- Add site-verifications here -->
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.js"></script>
+              <script>document.addEventListener("DOMContentLoaded", function () {
+               var mathElements = document.getElementsByClassName("math");
+               var macros = [];
+               for (var i = 0; i < mathElements.length; i++) {
+                var texText = mathElements[i].firstChild;
+                if (mathElements[i].tagName == "SPAN") {
+                 katex.render(texText.data, mathElements[i], {
+                  displayMode: mathElements[i].classList.contains('display'),
+                  throwOnError: false,
+                  macros: macros,
+                  fleqn: false
+                 });
+              }}});
+              </script>
+              <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" />
+         </head>
+   <body>
+            <!-- From https://getbootstrap.com/docs/4.5/components/navbar/ -->
+            <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+               <a class="navbar-brand" href="#">Machine Learning synthesis</a>
+
+            </nav>
+            <div class="container">
+         <h1 class="title">Machine learning - synthesis</h1>
+                  <div class="row">
+            <div class="col-xl-10"><h2 id="data-representation">Data representation</h2>
 <h3 id="definitions">Definitions</h3>
 <ul>
 <li><span class="math inline">X</span>: real random vector taking values in <span class="math inline">\mathcal{X}</span></li>
@@ -634,6 +614,66 @@ l(\theta) = \sum_{i=0}^n \ln( \prod_{l=1}^k \frac{e^{\theta_l^T x_i}}{\sum_{j=1}
 <h2 id="model-validation">Model validation</h2>
 <p>TO-DO</p>
 <h2 id="learning-algorithm-selection">Learning algorithm selection</h2>
-<p>TO-DO</p>
-</body>
+<p>TO-DO</p></div>
+            <div class="d-none d-xl-block col-xl-2 bd-toc">
+               <ul class="section-nav">
+                  <li class="toc-entry"><ul>
+<li><a href="#data-representation">Data representation</a>
+<ul>
+<li><a href="#definitions">Definitions</a></li>
+<li><a href="#pre-treatments">Pre-treatments</a></li>
+<li><a href="#handling-missing-data">Handling missing data</a></li>
+<li><a href="#dimensionality-reduction">Dimensionality reduction</a></li>
+</ul></li>
+<li><a href="#discriminative-problems">Discriminative problems</a>
+<ul>
+<li><a href="#loss-and-risk-functions">Loss and risk functions</a></li>
+<li><a href="#parametric-models">Parametric models</a></li>
+<li><a href="#non-parametric-models">Non parametric models</a></li>
+</ul></li>
+<li><a href="#neural-networks">Neural networks</a></li>
+<li><a href="#generative-problems">Generative Problems</a></li>
+<li><a href="#model-validation">Model validation</a></li>
+<li><a href="#learning-algorithm-selection">Learning algorithm selection</a></li>
+</ul></li>
+               </ul>
+            </div>
+         </div>
+               </div>
+            <!-- Add comment hosting service here -->
+            <!-- Footer -->
+            <footer class="footer text-muted">
+               <div align="center">
+                  <!-- Update licences -->
+                  Content is available under <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a>
+                  &nbsp;|&nbsp;
+                  Sourcecode licensed under <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" target="_blank" rel="noopener">GPL-3.0</a>
+                  <br />
+                  <!-- Please keep the following line -->
+                  Built with <a href="https://www.pandoc.org" target="_blank" rel="noopener">Pandoc</a> 
+                  using <a href="https://github.com/ashki23/pandoc-bootstrap" target="_blank" rel="noopener">pandoc-bootstrap</a> theme
+                  <br />
+                  <!-- Update copyright -->
+                  Copyright, Author Name
+               </div>
+            </footer>
+            <!-- Add global site tag (gtag.js) and site analytics here -->
+            <!-- JS, Popper.js, and jQuery -->
+      <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+      <!-- Mathjax -->
+      <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script>
+         /* Bootstrap styles to tables */
+         function bootstrapStylePandocTables() {
+         $('tr.header').parent('thead').parent('table').addClass('table table-condensed'); }
+         $(document).ready(function () { bootstrapStylePandocTables(); });
+         /* Adjust the height when click the toc */
+         var shiftWindow = function() { scrollBy(0, -60) };
+         window.addEventListener("hashchange", shiftWindow);
+         function load() { if (window.location.hash) shiftWindow(); }
+      </script>
+   </body>
 </html>
