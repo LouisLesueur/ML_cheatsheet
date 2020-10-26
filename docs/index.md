@@ -394,10 +394,10 @@ Decision tree algorithm are generally based on the same procedure:
 >2.  Select an attribute on the basis of splitting criteria (Gain Ratio or other impurity metrics, discussed below)
 >3. Partition instances according to selected attribute recursively
 
-There are mainly two "impurity metrics" (here $f_i$ is the fraction of elements of class i in the set):
+There are mainly two "impurity metrics" (here $D$ is a dataset and $p_i$ is the fraction of elements of class i in the set):
 
 + Gini: $I_G(D) = 1 - \sum_{i=1}^{|D|} p_i^2$
-+ Shannon: $I_E(D) = -\sum_{i=1}^{|D|} p_i \log_2 f_i$
++ Shannon: $I_E(D) = -\sum_{i=1}^{|D|} p_i \log_2 p_i$
 
 Decision tree building algorithm: CART; ID3;
 Good refrence (in French !) for CART [here](https://math.unice.fr/~malot/presCART.pdf), will be summarized in the future

@@ -621,10 +621,10 @@ f_k(x) = \frac{1}{k} \sum_{x_i \in N_k(x)} y_i
 <li>Partition instances according to selected attribute recursively</li>
 </ol>
 </blockquote>
-<p>There are mainly two “impurity metrics” (here <span class="math inline">f_i</span> is the fraction of elements of class i in the set):</p>
+<p>There are mainly two “impurity metrics” (here <span class="math inline">D</span> is a dataset and <span class="math inline">p_i</span> is the fraction of elements of class i in the set):</p>
 <ul>
 <li>Gini: <span class="math inline">I_G(D) = 1 - \sum_{i=1}^{|D|} p_i^2</span></li>
-<li>Shannon: <span class="math inline">I_E(D) = -\sum_{i=1}^{|D|} p_i \log_2 f_i</span></li>
+<li>Shannon: <span class="math inline">I_E(D) = -\sum_{i=1}^{|D|} p_i \log_2 p_i</span></li>
 </ul>
 <p>Decision tree building algorithm: CART; ID3; Good refrence (in French !) for CART <a href="https://math.unice.fr/~malot/presCART.pdf">here</a>, will be summarized in the future</p>
 <h5 id="random-forests">Random forests</h5>
