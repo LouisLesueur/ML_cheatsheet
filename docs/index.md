@@ -400,9 +400,24 @@ There are mainly two "impurity metrics" (here $f_i$ is the fraction of elements 
 + Shannon: $I_E(D) = -\sum_{i=1}^{|D|} p_i \log_2 f_i$
 
 Decision tree building algorithm: CART; ID3;
-Good refrence (in French !) for CART [here](https://math.unice.fr/~malot/presCART.pdf)
+Good refrence (in French !) for CART [here](https://math.unice.fr/~malot/presCART.pdf), will be summarized in the future
 
 ##### Random forests
+
+Random forests applies the general technique of bootstrap aggregating to tree learners.
+
+The dataset is splitted in $B$ parts. On each a random tree is trained, and the final predictor has the form:
+
+$$
+f(x) = \frac{1}{B} \sum_{b=1}^B f_b(x)
+$$
+
+where $f_b$ is the predictor of the $b$-th tree.
+
+The uncertainty of the prediction can be estimated by:
+$$
+\sigma = \sqrt{\frac{\sum_b (f_b(x)-f(x))^2}{B-1}}
+$$
 
 ## Neural networks
 

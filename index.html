@@ -626,8 +626,17 @@ f_k(x) = \frac{1}{k} \sum_{x_i \in N_k(x)} y_i
 <li>Gini: <span class="math inline">I_G(D) = 1 - \sum_{i=1}^{|D|} p_i^2</span></li>
 <li>Shannon: <span class="math inline">I_E(D) = -\sum_{i=1}^{|D|} p_i \log_2 f_i</span></li>
 </ul>
-<p>Decision tree building algorithm: CART; ID3; Good refrence (in French !) for CART <a href="https://math.unice.fr/~malot/presCART.pdf">here</a></p>
+<p>Decision tree building algorithm: CART; ID3; Good refrence (in French !) for CART <a href="https://math.unice.fr/~malot/presCART.pdf">here</a>, will be summarized in the future</p>
 <h5 id="random-forests">Random forests</h5>
+<p>Random forests applies the general technique of bootstrap aggregating to tree learners.</p>
+<p>The dataset is splitted in <span class="math inline">B</span> parts. On each a random tree is trained, and the final predictor has the form:</p>
+<p><span class="math display">
+f(x) = \frac{1}{B} \sum_{b=1}^B f_b(x)
+</span></p>
+<p>where <span class="math inline">f_b</span> is the predictor of the <span class="math inline">b</span>-th tree.</p>
+<p>The uncertainty of the prediction can be estimated by: <span class="math display">
+\sigma = \sqrt{\frac{\sum_b (f_b(x)-f(x))^2}{B-1}}
+</span></p>
 <h2 id="neural-networks">Neural networks</h2>
 <p>TO-DO</p>
 <h2 id="generative-problems">Generative Problems</h2>
