@@ -380,7 +380,7 @@ $$
 f_k(x) = \frac{1}{k} \sum_{x_i \in N_k(x)} y_i
 $$
 
-where $N_k(x)$ is the neigbourhood of $x$ defined by its $k$ closest points according to a metric to define (euclidian, sin...). Note that an appropriate metric can be learned itself from the dataset, using metric learning algoritms like LMNN.
+where $N_k(x)$ is the neigbourhood of $x$ defined by its $k$ closest points according to a metric to define (euclidian, sin...). Note that an appropriate metric can be learned itself from the dataset, using metric learning algoritms like LMNN (cf [here](http://researchers.lille.inria.fr/abellet/talks/metric_learning_tutorial_CIL.pdf) for more precisions on metric learning).
 
 #### Tree-based models
 
