@@ -605,11 +605,11 @@ l(\theta) = \sum_{i=0}^n \ln( \prod_{l=1}^k \frac{e^{\theta_l^T x_i}}{\sum_{j=1}
 </tbody>
 </table>
 <h3 id="non-parametric-models">Non parametric models</h3>
-<h4 id="k-nn-regressor">k-NN regressor</h4>
-<p>The k-NN regressor estimates <span class="math inline">f</span> directly by: <span class="math display">
+<h4 id="k-nn">k-NN</h4>
+<p>The k-NN predictor estimates <span class="math inline">f</span> directly by: <span class="math display">
 f_k(x) = \frac{1}{k} \sum_{x_i \in N_k(x)} y_i
 </span></p>
-<p>where <span class="math inline">N_k(x)</span> is the neigbourhood of <span class="math inline">x</span> defined by its <span class="math inline">k</span> closest points according to a metric to define (euclidian, sin…)</p>
+<p>where <span class="math inline">N_k(x)</span> is the neigbourhood of <span class="math inline">x</span> defined by its <span class="math inline">k</span> closest points according to a metric to define (euclidian, sin…). Note that an appropriate metric can be learned itself from the dataset, using metric learning algoritms like LMNN.</p>
 <h4 id="tree-based-models">Tree-based models</h4>
 <h5 id="decision-trees">Decision trees</h5>
 <p>Decision tree can serve for regression and classification.</p>
