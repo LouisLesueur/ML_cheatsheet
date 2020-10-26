@@ -380,10 +380,29 @@ $$
 f_k(x) = \frac{1}{k} \sum_{x_i \in N_k(x)} y_i
 $$
 
-where $N_k(x)$ is the neigbpurhood of $x$ defined by its $k$ closest points according to a metric to define (euclidian, sin...)
+where $N_k(x)$ is the neigbourhood of $x$ defined by its $k$ closest points according to a metric to define (euclidian, sin...)
 
 #### Tree-based models
 
+##### Decision trees
+
+Decision tree can serve for regression and classification.
+
+Decision tree algorithm are generally based on the same procedure:
+
+>1. Start at the root node with all training instances
+>2.  Select an attribute on the basis of splitting criteria (Gain Ratio or other impurity metrics, discussed below)
+>3. Partition instances according to selected attribute recursively
+
+There are mainly two "impurity metrics" (here $f_i$ is the fraction of elements of class i in the set):
+
++ Gini: $I_G(D) = 1 - \sum_{i=1}^{|D|} p_i^2$
++ Shannon: $I_E(D) = -\sum_{i=1}^{|D|} p_i \log_2 f_i$
+
+Decision tree building algorithm: CART; ID3;
+Good refrence (in French !) for CART [here](https://math.unice.fr/~malot/presCART.pdf)
+
+##### Random forests
 
 ## Neural networks
 
