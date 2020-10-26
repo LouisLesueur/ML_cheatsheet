@@ -1,29 +1,75 @@
 ---
-title: Supervised learning - synthesis
+title: Machine learning - synthesis
+author: Louis Lesueur
 ---
 
 ## Data representation
 
 ### Definitions
 
-+ $X$: real random vector taking values $x \in \mathcal{X}$
-+ $Y$: real random vector taking values $y \in \mathcal{Y}$
++ $X$: real random vector taking values in $\mathcal{X}$
++ $Y$: real random vector taking values in $\mathcal{Y}$
   + For a regression problem: $\mathcal{Y}=\mathbb{R}$
   + For a classification problem: $\mathcal{Y} = \{C_k \}_{k<K}$ ($K$ classes)
 + $p_{XY}$ joint distribution of $(X,Y)$, unknown
 
 ### Pre-treatments
 
-TO-DO
+For a dataset $\mathcal{X}_n$, composed of $n$ samples from $X$ we note:
+
++ $x$ the dataset
++ $x_i$ the $i$-th sample
++ $x_i^{(j)}$ the $j$-th feature of the $i$-th sample
+
+Several pre-treatments can be applied:
+
+#### One-Hot encoding
+
+To encode string features with a finite amount of values possibles $l$, it is better to encode them in a $l$ long binary vector. For example, if the feature is "color", and the possible values are "red", "yellow" and "green", they'll be eoncoded as:
+
++ red = [1,0,0]
++ yellow = [0,1,0]
++ green = [0,0,1]
+
+This ensures that the euclidian distance between each color is the same and won't damage the learning.
+
+
+#### Feature rescaling (normalization and standardization)
+
+
+|Normalization | Standardization |
+|----|----|
+|$x^{(j)} \leftarrow \frac{x^{(j)} - min^{(j)}}{max^{(j)} - min^{(j)}}$|$x^{(j)} \leftarrow \frac{x^{(j)} - \mu^{(j)}}{\sigma^{(j)}}$ |
+
+To chose between the two there is no general rule, but:
+
++ In practice, unsupervised algorithms more often benefit from standardization than from normalization
++ Standardization is better if the feature is already distributed along a gaussian
++ Standardization is also better if the dataset contains outliers (because normalization squeeze them)
++ In all other cases, normalization has to be prefered because it ensures that all features are in the same range, and that not anyone will dominate during optimization. It also prevents overflows in calculs
+
 
 ### Handling missing data
 
-TO-DO
+When some feature values are missing from the dataset, one can:
++ Remove the corresponding data sample (if the dataset is big enough)
++ Use a learning algorithm that can deal with missing features
++ Use a data imputation technique
 
+#### Data imputation techniques
+
++ Replace the missing value by an average value of the feature in the dataset
++ Replace it by a value outside the normal range, the idea is that the algorithm will learn what to do when a feature has a value different from others
++ Replace it by a median value in the normal range, the idea is that a median value won't have a big impact on the prediction.
++ Use all the remaining features to built the missing using a regression algorithm
+
+### Dimensionality reduction
+
+Finally, if the dataset dimension is too big, the optimization will be slow because of the curse of dimensionnality. One way to accelerate the training is to reduce dimensionnality, by keeping the maximum of information using PCA or other algorithms.
 
 ## Discriminative problems
 
-In discriminative problems, we have a labelized sample $\mathcal{D}_n = \{(x_i, y_i) \in \mathcal{X}\times\mathcal{Y}\}$, from $p_{XY}$, and we want to determine $p(y | x)$
+In discriminative problems, we have a labelized sample $\mathcal{D}_n = \{(x_i, y_i) \in \mathcal{X}\times\mathcal{Y}\}$, from $p_{XY}$, and we want to directly determine $p(y | x)$
 
 ### Loss and risk functions
 
@@ -55,7 +101,9 @@ Errors:
 + total: $f^* - \hat{f}$
 
 
-### Maximum Likelihood principle
+### Parametric models
+
+#### Maximum Likelihood principle
 
 In Machine Learning, most of the time we make assumption on data:
 
@@ -90,21 +138,6 @@ R(f_\theta) - R(f^*) = \text{KL}(p_\theta, p^*)
 $$
 
 
-#### GLM (Generalized Linear Models)
-
-General linear models are defined by the following assumptions on data:
-
-+ Exponential family (cf table): $p_\theta(y|x, \theta) = b(y) \exp{\eta T(y) - a(\eta)}$
-+ $f_\theta(x) = \mathbb{E}(y|x, \theta)$
-+ $\eta = \theta^Tx$
-
-|Distribution | $\eta$                      | $T(y)$ | $a(\eta)$                        | $b(y)$ |
-|-------------|-----------------|-------------------|---------------------------|--------|
-|Bernoulli    | $\ln{\frac{\phi}{1-\phi}}$ | y      | $\ln(1+e^{\eta})$               | 1
-|Gaussian     | $\mu$                       | y      | $\frac{\eta^2}{2}$               | $\frac{1}{\sqrt{2\pi}} \exp(\frac{-y^2}{2})$
-|Poisson      | $\ln{\lambda}$             | y      | $\exp{\eta}$                     | $\frac{1}{y!}$
-|Geometric    | $\ln{(1-\phi)}$              | y      | $\ln \frac{e^\eta}{1-e^\eta}$   | 1
-| Multinomial ($k$ classes) | $[\ln\frac{\phi_i}{\phi_k}]_{i<k}$ | $T(i) = (0...1...0)$ (defined on integers between 0 and k-1, 1 in the i-th position) | $-\ln(\phi_k)$ | 1
 
 #### Loss minimization
 
@@ -136,14 +169,28 @@ $$
 P(\hat{\theta}) = P(\theta(\hat{\alpha})) = D(\hat{\alpha})
 $$
 
-#### The kernel trick for non-linear models
+##### The kernel trick for non-linear models
 
-TO-DO
+When there are only scalar products between data in the problem (which is the case for the dual in general), one can use the kernel trick. For a mapping $\phi$ of the data in another space, the scalar product can be computed using a well chosen kernel function (symmetric and positive semi-definite, Mercer theorem)
 
+$$
+k(x,y) = \phi(x) \cdot \phi(y)
+$$
 
-#### Algorithms to solve the minimization problem
+Common kernels:
+
+|Name | $k(x,y)$ |
+|---|---|
+|Linear | $x^Ty$ |
+|Polynomial| $(r+x^Ty)^p$ |
+|Gaussian | $\exp(-\frac{||x-y||^2}{2 \sigma ^2})$
+|Exponential | $\exp(-\alpha ||x-y||)$
+|tanh | $\tanh(\alpha x^Ty + c)$
+
+##### Algorithms to solve the minimization problem
 
 We note:
+
 + $J_i(\theta) = L( f_\theta(x_i), y_i ) + n\lambda C(\theta)$
 + $J(\theta) = \frac{1}{n} \sum_i J_i(\theta)$
 
@@ -155,12 +202,19 @@ Descent methods ($i_k$ is a random index):
 |SGD             |primal     |$\theta \leftarrow  \theta - \gamma \nabla_\theta J_{i_k}(\theta)$|
 |Newton          |primal     |$\theta \leftarrow  \theta - Hess^{-1}_\theta(J)\nabla_\theta J(\theta)$|
 |SAG             |primal     |$\theta \leftarrow \theta - \frac{\gamma}{n} \sum_i(\nabla_\theta J_{i_k}(\theta) \mathbb{1}_{i=i_k}+y_i\mathbb{1}_{i\neq i_k})$|
-|SMO             |dual       ||
-|BFGS            |primal     ||
-|SDCA            |primal-dual||
+
+Other algorithms:
+
+|Name            | type      |
+|----------------|-----------|
+|BFGS            |primal     |
+|SMO             |dual       |
+|SDCA            |primal-dual|
+
+To solve a linear system: conjugate gradient
 
 
-### Loss functions and corresponding problems:
+#### Loss functions and corresponding problems:
 
 A loss function is defined by:
 
@@ -170,28 +224,46 @@ $$
 
 Detailed loss function theory in _How to compare different loss functions and their risks._
 
-#### Binary classification
 
-ATTENTION: here $f$ is not exactely the predictor !
+##### GLM (Generalized Linear Models)
+
+General linear models are defined by the following assumptions on data:
+
++ Exponential family (cf table): $p_\theta(y|x) = b(y) \exp{(\chi T(y) - a(\eta))}$
++ $f_\theta(x) = \mathbb{E}_\theta(y|x)$
++ $\chi = \theta^Tx$
+
+By writing the corresponding loglikelihood, these GLM leads to the most famous problems of Machine Learning (Least square regression, logistic regression, and softmax regression in particular, cf next subsections)
+
+|Distribution | $\chi$                      | $T(y)$ | $a(\chi)$                        | $b(y)$ |
+|-------------|-----------------|-------------------|---------------------------|--------|
+|Bernoulli    | $\ln{\frac{\mu}{1-\mu}}$ | y      | $\ln(1+e^{\chi})$               | 1
+|Gaussian     | $\mu$                       | y      | $\frac{\chi^2}{2}$               | $\frac{1}{\sqrt{2\pi}} \exp(\frac{-y^2}{2})$
+|Poisson      | $\ln{\mu}$             | y      | $\exp{\chi}$                     | $\frac{1}{y!}$
+|Geometric    | $\ln{(1-\mu)}$              | y      | $\ln \frac{e^\chi}{1-e^\chi}$   | 1
+| Multinomial ($k$ classes) | $[\ln\frac{\mu_i}{\mu_k}]_{i<k}$ | $T(i) = (0...1...0)$ (defined on integers between 0 and k-1, 1 in the i-th position) | $-\ln(\mu_k)$ | 1
+
+
+##### Binary classification
 
 Binary classifier: $g: \mathcal{X} \rightarrow \{-1,1\}$
 
-In general, $g$ is decomposed as: $g(x) = sgn(h(x))$, with:
+In general, $g$ is decomposed as: $g(x) = sgn(f(x))$, with:
 
-+ $h(x) = f(\eta(x))$, the predictor
-  + $f: [0,1] \rightarrow \mathbb{R}$ a link function
++ $f(x) = h(\eta(x))$, the predictor
+  + $h: [0,1] \rightarrow \mathbb{R}$ a link function
   + $\eta(x) = \mathbb{P}_{Y | X}(1 | x)$, the learned probability
 
-The optimal link function $f^*$ can generaly be obtained analiticaly, so classification problems are reduced to find an estimation $\hat{\eta}$ of $\eta$.
+The optimal link function $h^*$ can generaly be obtained analiticaly, so classification problems are reduced to find an estimation $\hat{\eta}$ of $\eta$.
 
-**To do so, one can set: $h(x) = h_\theta(x)$ ($=\theta^Tx$ most of the time), minimize the empirical risk (using the corresponding loss), and deduce an optimal predictor $\hat{h}$, and $\hat{\eta}(x) = f^{*-1}(\hat{h}(x))$**
+**To do so, one can set: $f(x) = f_\theta(x)$ ($=\theta^Tx$ most of the time), minimize the empirical risk (using the corresponding loss), and deduce an optimal predictor $\hat{h}$, and $\hat{\eta}(x) = h^{*-1}(\hat{h}(x))$**
 
-For classification problem, loss can be written: $L(y,x) = \phi(yf(x))$ (margin-based loss functions)
+For classification problem, loss can be written: $L(y,x) = \phi(yh(x))$ (margin-based loss functions)
 
-The corresponding conditionnal risk: $C_\phi(\eta, f) = \eta \phi(f) + (1-\eta) \phi(-f)$
+The corresponding conditionnal risk: $C_\phi(\eta, h) = \eta \phi(h) + (1-\eta) \phi(-h)$
 
 
-|Name         |$\phi(v)$        |  $f^*_\phi(\eta)$                      | $f^{*-1}_\phi(v)$ | $C^*_\phi(\eta)$                             | $L^{\#}(y,-a)$ | properties
+|Name         |$\phi(v)$        |  $h^*_\phi(\eta)$                      | $h^{*-1}_\phi(v)$ | $C^*_\phi(\eta)$                             | $L^{\#}(y,-a)$ | properties
 |----------------|----------------------------|----------------------|----------------------|------------------------------------------|-----------------------|-----------------------------------|
 | $0/1$       | $sgn(v)$        | $sgn(2\eta -1)$              |               |                                              |                | Not used in practise because $NP$ hard
 | square      | $(1-v)^2$       | $2\eta -1$         |          $\frac{1}{2}(v+1)$          | $4\eta(1-\eta)$                              |                |
@@ -222,9 +294,9 @@ plt.legend()
 
 ```
 
-#### Multilabel classification
+##### Multilabel classification
 
-##### Softmax
+###### Softmax
 
 It is built from multinomial GLM. Inversing its link function gives:
 
@@ -250,7 +322,7 @@ $$
 \min_\theta - \sum_{i=0}^n y_i \ln(\frac{e^{\theta_l^T x_i}}{\sum_{j=1}^k e^{\theta_j^T x_i}})
 $$
 
-#### Regression
+##### Regression
 
 |Name  | $L(y,x)$        |$L^(y,-a)$ |  properties  |
 |------|-----------------|------------|-------------|
@@ -280,7 +352,7 @@ plt.legend()
 ```
 
 
-#### Regularizations
+##### Regularizations
 
 |Name | $C(w)$ | properties |
 |----------|--------|-------------------|
@@ -290,7 +362,7 @@ plt.legend()
 |$L^p$ (often $0<p<1$)| $||w||_p$ |non convex, very sparse solutions, initialization dependant, not differentiable
 
 
-#### Focus on linear regression
+##### Focus on linear regression
 
 |Name | loss | regularizer | Solution |
 |-----|-----|-----|-----|
@@ -321,7 +393,6 @@ TO-DO
 
 TO-DO
 
+## Learning algorithm selection
 
-## Bibliography
-
-+ Rosasco, Lorenzo & De Vito, Ernesto & Caponnetto, Andrea & Piana, Michele & Verri, Alessandro. (2004). Are Loss Functions All the Same?. Neural computation. 16. 1063-76. 10.1162/089976604773135104.
+TO-DO
