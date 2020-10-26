@@ -373,12 +373,16 @@ plt.legend()
 
 ### Non parametric models
 
-#### Finding a metric
+#### k-NN regressor
 
-kNN
-decision trees
-random forests
-Maximum-entropy Markov models
+The k-NN regressor estimates $f$ directly by:
+$$
+f_k(x) = \frac{1}{k} \sum_{x_i \in N_k(x)} y_i
+$$
+
+where $N_k(x)$ is the neigbpurhood of $x$ defined by its $k$ closest points according to a metric to define (euclidian, sin...)
+
+#### Tree-based models
 
 
 ## Neural networks
