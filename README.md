@@ -5,3 +5,9 @@ A synthetic cheatsheet for Machine Learning. The sheet is written in markdown, w
 ```bash
 ./generate.sh
 ```
+
+## TO-DO:
+
++ [ ] orthograph/syntax/consistency
++ [ ] add sources
++ [ ] write missing parts
