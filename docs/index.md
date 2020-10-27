@@ -237,11 +237,11 @@ By writing the corresponding loglikelihood, these GLM leads to the most famous p
 
 |Distribution | $\chi$                      | $T(y)$ | $a(\chi)$                        | $b(y)$ |
 |-------------|-----------------|-------------------|---------------------------|--------|
-|Bernoulli    | $\ln{\frac{\mu}{1-\mu}}$ | y      | $\ln(1+e^{\chi})$               | 1
-|Gaussian     | $\mu$                       | y      | $\frac{\chi^2}{2}$               | $\frac{1}{\sqrt{2\pi}} \exp(\frac{-y^2}{2})$
-|Poisson      | $\ln{\mu}$             | y      | $\exp{\chi}$                     | $\frac{1}{y!}$
-|Geometric    | $\ln{(1-\mu)}$              | y      | $\ln \frac{e^\chi}{1-e^\chi}$   | 1
-| Multinomial ($k$ classes) | $[\ln\frac{\mu_i}{\mu_k}]_{i<k}$ | $T(i) = (0...1...0)$ (defined on integers between 0 and k-1, 1 in the i-th position) | $-\ln(\mu_k)$ | 1
+|Bernoulli    | $\ln{\frac{\mu}{1-\mu}}$ | $y$      | $\ln(1+e^{\chi})$               | $1$
+|Gaussian     | $\mu$                       | $y$      | $\frac{\chi^2}{2}$               | $\frac{1}{\sqrt{2\pi}} \exp(\frac{-y^2}{2})$
+|Poisson      | $\ln{\mu}$             | $y$      | $\exp{\chi}$                     | $\frac{1}{y!}$
+|Geometric    | $\ln{(1-\mu)}$              | $y$      | $\ln \frac{e^\chi}{1-e^\chi}$   | $1$
+| Multinomial ($k$ classes) | $[\ln\frac{\mu_i}{\mu_k}]_{i<k}$ | $T(i) = (0...1...0)$ (defined on integers between 0 and k-1, 1 in the i-th position) | $-\ln(\mu_k)$ | $1$
 
 
 ##### Binary classification
@@ -268,7 +268,7 @@ The corresponding conditionnal risk: $C_\phi(\eta, h) = \eta \phi(h) + (1-\eta) 
 | $0/1$       | $sgn(v)$        | $sgn(2\eta -1)$              |               |                                              |                | Not used in practise because $NP$ hard
 | square      | $(1-v)^2$       | $2\eta -1$         |          $\frac{1}{2}(v+1)$          | $4\eta(1-\eta)$                              |                |
 | modified LS | $\max(1-v,0)^2$ | $2\eta -1$    | NA                         | $4\eta(1-\eta)$                              |                |
-| SVM         | $\max(1-v,0)$   | $sgn(2\eta-1)$     | NA                    | $1-|2\eta -1 |$                              | -ay            |
+| SVM         | $\max(1-v,0)$   | $sgn(2\eta-1)$     | NA                    | $1-|2\eta -1 |$                              | $-ay$            |
 | Boosting    | $e^{-v}$        | $\frac{1}{2} \ln \frac{\eta}{1-\eta}$ | $\frac{e^{2v}}{1+e^{2v}}$ | $2 \sqrt{\eta(1-\eta)}$                      |                | The loss of a mis-prediction increases exponentially with the value of $-v$
 | Logistic    | $\ln(1+e^{-v})$ | $\ln \frac{\eta}{1-\eta}$  | $\frac{e^v}{1+e^v}$           | $-\eta \ln{\eta} - (1-\eta) \ln{(1-\eta)}$ | $ay \ln{ay} + (1-ay) \ln(1-ay)$| It is a GLM (for Bernoulli distribution), equivalent to cross-entropy loss
 | Savage      | $\frac{1}{(1+e^v)^2}$ | $\ln \frac{\eta}{1-\eta}$ | $\frac{e^v}{1+e^v}$  | $\eta(1-\eta)$ | | non-convex, better for outliers
@@ -324,10 +324,10 @@ $$
 
 ##### Regression
 
-|Name  | $L(y,x)$        |$L^(y,-a)$ |  properties  |
+|Name  | $L(y,x)$        |$L^#(y,-a)$ |  properties  |
 |------|-----------------|------------|-------------|
 |square| $(y-x)^2$       | $-ay + \frac{a^2}{4}$ |estimates mean label, sensitive to outliers, differentiable everywhere
-|absolute | $|y-x|$ | -ay | estimates median label, less sensitive to noise, not differentiable in 0
+|absolute | $|y-x|$ | $-ay$ | estimates median label, less sensitive to noise, not differentiable in 0
 |Huber | $\frac{1}{2} (y-x)^2$ if $|x-y| < \delta$, $\delta(|y-x| - \frac{\delta}{2})$ otherwise | | "Best of Both Worlds" of Squared and Absolute Loss , Takes on behavior of Squared-Loss when loss is small, and Absolute Loss when loss is large.  Once differentiable
 |log-ch | $\ln(\cosh(y-x))$ | | Similar to Huber Loss, but twice differentiable everywhere
 
