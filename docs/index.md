@@ -274,25 +274,8 @@ The corresponding conditionnal risk: $C_\phi(\eta, h) = \eta \phi(h) + (1-\eta) 
 | Savage      | $\frac{1}{(1+e^v)^2}$ | $\ln \frac{\eta}{1-\eta}$ | $\frac{e^v}{1+e^v}$  | $\eta(1-\eta)$ | | non-convex, better for outliers
 | Tangent      | $(2 \arctan(v)-1)^2$ | $\tan(\eta - \frac{1}{2})$ | $\arctan(v) + \frac{1}{2}$ | $4\eta(1-\eta)$ | | non-convex, better for outliers
 
+![](plots/classification.svg)
 
-```{.matplotlib preamble=plot.py}
-x = np.linspace(-6,2,100)
-plt.figure(figsize=(15,5))
-plt.plot(x, np.sign(x), label="0/1")
-plt.plot(x, (1-x)**2, label="square")
-plt.plot(x, np.maximum((1-x)**2,0), label="modified LS")
-plt.plot(x, np.maximum((1-x),0), label="SVM")
-plt.plot(x, np.exp(-x), label="Boost")
-plt.plot(x, np.log(1+np.exp(-x)), label="Logistic")
-plt.plot(x, 1/((1+np.exp(x))**2), label="Savage")
-plt.plot(x, (2*np.arctan(x)-1)**2, label="Tangent")
-plt.xlim(-1,2)
-plt.ylim(-2, 4)
-plt.title("Classification loss functions (y=1)")
-
-plt.legend()
-
-```
 
 ##### Multilabel classification
 
@@ -324,33 +307,14 @@ $$
 
 ##### Regression
 
-|Name  | $L(y,x)$        |$L^#(y,-a)$ |  properties  |
+|Name  | $L(y,x)$        |$L^\#(y,-a)$ |  properties  |
 |------|-----------------|------------|-------------|
 |square| $(y-x)^2$       | $-ay + \frac{a^2}{4}$ |estimates mean label, sensitive to outliers, differentiable everywhere
 |absolute | $|y-x|$ | $-ay$ | estimates median label, less sensitive to noise, not differentiable in 0
 |Huber | $\frac{1}{2} (y-x)^2$ if $|x-y| < \delta$, $\delta(|y-x| - \frac{\delta}{2})$ otherwise | | "Best of Both Worlds" of Squared and Absolute Loss , Takes on behavior of Squared-Loss when loss is small, and Absolute Loss when loss is large.  Once differentiable
 |log-ch | $\ln(\cosh(y-x))$ | | Similar to Huber Loss, but twice differentiable everywhere
 
-```{.matplotlib preamble=plot.py}
-x = np.linspace(-2,3,100)
-
-out = (np.abs(1-x)-0.5)
-out[np.where(np.abs(1-x)<1)] = 0.5*(1-x[np.where(np.abs(1-x)<1)])**2
-
-plt.figure(figsize=(5,5))
-plt.plot(x, (1-x)**2, label="square")
-plt.plot(x, np.abs(1-x), label="absolute")
-plt.plot(x, out, label="Huber, delta = 1")
-plt.plot(x, np.log(np.cosh(1-x)), label="log-ch")
-
-plt.xlim(-1,3)
-plt.ylim(-0.5, 4.5)
-plt.title("Classification loss functions (y=1)")
-
-plt.legend()
-
-```
-
+![](plots/reg.svg)
 
 ##### Regularizations
 
@@ -421,7 +385,16 @@ $$
 
 ## Neural networks
 
-TO-DO
+A neural network is a model of the form $y=f_{NN}(x)$, where $f_{NN}$ is a nested function.
+
+### FFNN
+
+![](img/ffnn.svg)
+
+
+### CNN
+
+### RNN
 
 ## Generative Problems
 

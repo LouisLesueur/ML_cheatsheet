@@ -31,6 +31,7 @@
               }}});
               </script>
               <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" />
+              <link rel="stylesheet" href="custom.css" />
          </head>
    <body>
             <!-- From https://getbootstrap.com/docs/4.5/components/navbar/ -->
@@ -469,9 +470,7 @@ L: \mathcal{Y} \times \mathcal{Y} \rightarrow [0, +\infty )
 </tr>
 </tbody>
 </table>
-<figure>
-<img src="plots/5206064366391498750.png" />
-</figure>
+<p><img src="plots/classification.svg" /></p>
 <h5 id="multilabel-classification">Multilabel classification</h5>
 <h6 id="softmax">Softmax</h6>
 <p>It is built from multinomial GLM. Inversing its link function gives:</p>
@@ -502,7 +501,7 @@ l(\theta) = \sum_{i=0}^n \ln( \prod_{l=1}^k \frac{e^{\theta_l^T x_i}}{\sum_{j=1}
 <tr class="header">
 <th>Name</th>
 <th><span class="math inline">L(y,x)</span></th>
-<th><span class="math inline">L^#(y,-a)</span></th>
+<th><span class="math inline">L^\#(y,-a)</span></th>
 <th>properties</th>
 </tr>
 </thead>
@@ -533,9 +532,7 @@ l(\theta) = \sum_{i=0}^n \ln( \prod_{l=1}^k \frac{e^{\theta_l^T x_i}}{\sum_{j=1}
 </tr>
 </tbody>
 </table>
-<figure>
-<img src="plots/13146123143602842735.png" />
-</figure>
+<p><img src="plots/reg.svg" /></p>
 <h5 id="regularizations">Regularizations</h5>
 <table>
 <colgroup>
@@ -638,7 +635,11 @@ f(x) = \frac{1}{B} \sum_{b=1}^B f_b(x)
 \sigma = \sqrt{\frac{\sum_b (f_b(x)-f(x))^2}{B-1}}
 </span></p>
 <h2 id="neural-networks">Neural networks</h2>
-<p>TO-DO</p>
+<p>A neural network is a model of the form <span class="math inline">y=f_{NN}(x)</span>, where <span class="math inline">f_{NN}</span> is a nested function.</p>
+<h3 id="ffnn">FFNN</h3>
+<p><img src="img/ffnn.svg" /></p>
+<h3 id="cnn">CNN</h3>
+<h3 id="rnn">RNN</h3>
 <h2 id="generative-problems">Generative Problems</h2>
 <p>TO-DO</p>
 <h2 id="model-validation">Model validation</h2>
@@ -661,7 +662,12 @@ f(x) = \frac{1}{B} \sum_{b=1}^B f_b(x)
 <li><a href="#parametric-models">Parametric models</a></li>
 <li><a href="#non-parametric-models">Non parametric models</a></li>
 </ul></li>
-<li><a href="#neural-networks">Neural networks</a></li>
+<li><a href="#neural-networks">Neural networks</a>
+<ul>
+<li><a href="#ffnn">FFNN</a></li>
+<li><a href="#cnn">CNN</a></li>
+<li><a href="#rnn">RNN</a></li>
+</ul></li>
 <li><a href="#generative-problems">Generative Problems</a></li>
 <li><a href="#model-validation">Model validation</a></li>
 <li><a href="#learning-algorithm-selection">Learning algorithm selection</a></li>
