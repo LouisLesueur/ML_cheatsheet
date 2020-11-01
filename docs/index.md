@@ -1,5 +1,5 @@
 ---
-title: Machine learning - synthesis
+title: Supervised learning - synthesis
 author: Louis Lesueur
 ---
 
@@ -624,39 +624,15 @@ To estimate the good of fit of a classifier one can compute the measures:
 
 To set the threshold  $t$ of decision, plot the ROC curve: $p_{TP} = p_{FP}(t)$ and selection the one that maximaze the AUC (Area Under the Curve)
 
-## Generative classifiers
+## Generative models
 
-naive Bayes classifier and
-Bayesian network
-Hidden Markov model
-Markov random field
-linear discriminant analysis
-Gaussian Mixture Model
-Restricted Boltzmann machine
++ naive Bayes classifier
 
-## Unsupervised learning
+## Graphical models
 
-### Kernel density estimation and mean shift
-
-
-### Clustering
-hierarchical clustering
-k-means
-mixture models
-DBSCAN
-OPTICS algorithm
-
-### Anomaly detection
-Local Outlier Factor
-Isolation Forest
-
-### Dimenstion reduction
-Principal component analysis
-Independent component analysis
-
-### Neural Networks
-Autoencoders
-Deep Belief Nets
-Hebbian Learning
-Generative adversarial networks
-Self-organizing map
++ Bayesian network
++ Hidden Markov model
++ Markov random field
++ linear discriminant analysis
++ Gaussian Mixture Model
++ Restricted Boltzmann machine
