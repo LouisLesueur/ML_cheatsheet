@@ -743,8 +743,7 @@ f_{NN} = (f_1 \circ f_2 \ldots \circ f_L) \circ (pool_K \circ conv_K \circ \ldot
 </span></p>
 <h4 id="rnn">RNN</h4>
 <h3 id="model-performance-assessment-and-model-selection">Model Performance assessment, and model selection</h3>
-<h4 id="regression-1">Regression</h4>
-<h5 id="bias-variance-tradeoff">Bias-variance tradeoff</h5>
+<h4 id="bias-variance-tradeoff">Bias-variance tradeoff</h4>
 <p>Model selection consists in optimizing a model family or canditates (tuning the hyperparameters) To perform model selection, the dataset <span class="math inline">\mathcal{D}_n</span> is splitted in three subsets:</p>
 <ul>
 <li>Training: <span class="math inline">\mathcal{D}_{train}</span></li>
@@ -787,6 +786,7 @@ E_{test}(c) - E_{test}(c_{opt}) &gt; 0 \text{,  } \forall c &lt; c_{opt}
 <p><strong>good generalization capabilities</strong>: A model with complexity c has good generalization capabilities, if, for the test error of this model, the following holds: <span class="math display">
 E_{test}(c) - E_{train}(c) &lt; \delta \text{,  } \delta \in \mathbb{R}^+
 </span></p>
+<h4 id="regression-1">Regression</h4>
 <h5 id="model-evaluation">Model evaluation</h5>
 <p>We define (and we have: <span class="math inline">\text{SST} = \text{SSE} + \text{SSR}</span>):</p>
 <table>

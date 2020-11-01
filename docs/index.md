@@ -501,9 +501,8 @@ $$
 
 ### Model Performance assessment, and model selection
 
-#### Regression
 
-##### Bias-variance tradeoff
+#### Bias-variance tradeoff
 
 Model selection consists in optimizing a model family or canditates (tuning the hyperparameters)
 To perform model selection, the dataset $\mathcal{D}_n$ is splitted in three subsets:
@@ -565,6 +564,8 @@ model, the following holds:
 $$
 E_{test}(c) - E_{train}(c) < \delta \text{,  } \delta \in \mathbb{R}^+
 $$
+
+#### Regression
 
 ##### Model evaluation
 
