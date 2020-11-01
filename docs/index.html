@@ -1,0 +1,1019 @@
+<!doctype html>
+<html>
+   <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <meta name="generator" content="pandoc">
+      <meta name="author" content="Louis Lesueur">
+      
+      <title>Supervised learning - synthesis</title>
+      <!-- Bootstrap -->
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+      <!-- Font-awesome -->
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+      <!-- Styles -->
+      <link rel="stylesheet" href="https://ashki23.github.io/styles.css">
+            <!-- Add favicon here -->
+            <!-- Add site-verifications here -->
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.js"></script>
+              <script>document.addEventListener("DOMContentLoaded", function () {
+               var mathElements = document.getElementsByClassName("math");
+               var macros = [];
+               for (var i = 0; i < mathElements.length; i++) {
+                var texText = mathElements[i].firstChild;
+                if (mathElements[i].tagName == "SPAN") {
+                 katex.render(texText.data, mathElements[i], {
+                  displayMode: mathElements[i].classList.contains('display'),
+                  throwOnError: false,
+                  macros: macros,
+                  fleqn: false
+                 });
+              }}});
+              </script>
+              <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" />
+              <link rel="stylesheet" href="custom.css" />
+         </head>
+   <body>
+            <!-- From https://getbootstrap.com/docs/4.5/components/navbar/ -->
+            <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+               <a class="navbar-brand" href="#">Machine Learning synthesis</a>
+               <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                  <ul class="navbar-nav mr-auto">
+                     <li class="nav-item active">
+                        <a class="nav-link" href="index.html">Supervised <span class="sr-only">(current)</span></a>
+                     </li>
+                     <li class="nav-item">
+                        <a class="nav-link" href="unsupervised.html">Unsupervised</a>
+                     </li>
+                     <li class="nav-item">
+                        <a class="nav-link" href="reinforcement.html">Reinforcement</a>
+                     </li>
+                  </ul>
+               </div>
+
+            </nav>
+            <div class="container">
+         <h1 class="title">Supervised learning - synthesis</h1>
+                  <div class="row">
+            <div class="col-xl-10"><h2 id="data-representation">Data representation</h2>
+<h3 id="definitions">Definitions</h3>
+<ul>
+<li><span class="math inline">X</span>: real random vector taking values in <span class="math inline">\mathcal{X}</span></li>
+<li><span class="math inline">Y</span>: real random vector taking values in <span class="math inline">\mathcal{Y}</span>
+<ul>
+<li>For a regression problem: <span class="math inline">\mathcal{Y}=\mathbb{R}</span></li>
+<li>For a classification problem: <span class="math inline">\mathcal{Y} = \{C_k \}_{k&lt;K}</span> (<span class="math inline">K</span> classes)</li>
+</ul></li>
+<li><span class="math inline">p_{XY}</span> joint distribution of <span class="math inline">(X,Y)</span>, unknown</li>
+</ul>
+<h3 id="pre-treatments">Pre-treatments</h3>
+<p>For a dataset <span class="math inline">\mathcal{X}_n</span>, composed of <span class="math inline">n</span> samples from <span class="math inline">X</span> we note:</p>
+<ul>
+<li><span class="math inline">x</span> the dataset</li>
+<li><span class="math inline">x_i</span> the <span class="math inline">i</span>-th sample</li>
+<li><span class="math inline">x_i^{(j)}</span> the <span class="math inline">j</span>-th feature of the <span class="math inline">i</span>-th sample</li>
+</ul>
+<p>Several pre-treatments can be applied:</p>
+<h4 id="one-hot-encoding">One-Hot encoding</h4>
+<p>To encode string features with a finite amount of values possibles <span class="math inline">l</span>, it is better to encode them in a <span class="math inline">l</span> long binary vector. For example, if the feature is “color”, and the possible values are “red”, “yellow” and “green”, they’ll be eoncoded as:</p>
+<ul>
+<li>red = [1,0,0]</li>
+<li>yellow = [0,1,0]</li>
+<li>green = [0,0,1]</li>
+</ul>
+<p>This ensures that the euclidian distance between each color is the same and won’t damage the learning.</p>
+<h4 id="feature-rescaling-normalization-and-standardization">Feature rescaling (normalization and standardization)</h4>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Normalization</th>
+<th>Standardization</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">x^{(j)} \leftarrow \frac{x^{(j)} - min^{(j)}}{max^{(j)} - min^{(j)}}</span></td>
+<td><span class="math inline">x^{(j)} \leftarrow \frac{x^{(j)} - \mu^{(j)}}{\sigma^{(j)}}</span></td>
+</tr>
+</tbody>
+</table>
+<p>To chose between the two there is no general rule, but:</p>
+<ul>
+<li>In practice, unsupervised algorithms more often benefit from standardization than from normalization</li>
+<li>Standardization is better if the feature is already distributed along a gaussian</li>
+<li>Standardization is also better if the dataset contains outliers (because normalization squeeze them)</li>
+<li>In all other cases, normalization has to be prefered because it ensures that all features are in the same range, and that not anyone will dominate during optimization. It also prevents overflows in calculs</li>
+</ul>
+<h3 id="handling-missing-data">Handling missing data</h3>
+<p>When some feature values are missing from the dataset, one can: + Remove the corresponding data sample (if the dataset is big enough) + Use a learning algorithm that can deal with missing features + Use a data imputation technique</p>
+<h4 id="data-imputation-techniques">Data imputation techniques</h4>
+<ul>
+<li>Replace the missing value by an average value of the feature in the dataset</li>
+<li>Replace it by a value outside the normal range, the idea is that the algorithm will learn what to do when a feature has a value different from others</li>
+<li>Replace it by a median value in the normal range, the idea is that a median value won’t have a big impact on the prediction.</li>
+<li>Use all the remaining features to built the missing using a regression algorithm</li>
+</ul>
+<h3 id="dimensionality-reduction">Dimensionality reduction</h3>
+<p>Finally, if the dataset dimension is too big, the optimization will be slow because of the curse of dimensionnality. One way to accelerate the training is to reduce dimensionnality, by keeping the maximum of information using PCA or other algorithms.</p>
+<h2 id="loss-and-risk-functions">Loss and risk functions</h2>
+<p>In Machine Learning, we make assumption on data:</p>
+<p><span class="math display">
+Y = f(X) + \epsilon
+</span></p>
+<p>with <span class="math inline">\epsilon</span> iid zero mean noise.</p>
+<p>The goal is to estimate <span class="math inline">f</span>, to do so let introduce:</p>
+<ul>
+<li>Loss function <span class="math inline">L(y,y_{pred})</span>: measure the error of the predictor.</li>
+<li>Risk function <span class="math inline">R(f) = \mathbb{E}_{XY}(L(Y,f(X))) = \mathbb{E}_{X}(\mathbb{E}_{Y|X}(L(Y,f(X)) | X))</span></li>
+</ul>
+<p>The problem real solution is <span class="math display">
+f^* = \arg \min_f R(f)
+</span></p>
+<h2 id="discriminative-models">Discriminative models</h2>
+<p>In discriminative problems, we have a labelized sample <span class="math inline">\mathcal{D}_n = \{(x_i, y_i) \in \mathcal{X}\times\mathcal{Y}\}</span>, from <span class="math inline">p_{XY}</span>, and we want to directly determine <span class="math inline">p(y | x)</span></p>
+<p>Let’s introduce empirical risk function: <span class="math inline">R_{emp}(f, \mathcal{D}_n) = \frac{1}{n} \sum_i L(y_i, f(x_i))</span>, an estimator of <span class="math inline">R(f)</span></p>
+<p>To solve the problem, we chose a restricted set of possible function <span class="math inline">\mathcal{F}</span> (either parametric model, either not). We note: <span class="math display">
+\tilde{f} = \arg \min_{f \in \mathcal{F}} R(f)
+</span></p>
+<p>As we only have a sample <span class="math inline">\mathcal{D_n}</span> of the distribution <span class="math inline">p_{XY}</span>, which is unknown, in practise we compute: <span class="math display">
+\hat{f} = \arg \min_{f \in \mathcal{F}} R_{emp}(f, \mathcal{D}_n)
+</span></p>
+<p>Errors:</p>
+<ul>
+<li>approximation: <span class="math inline">f^*-\tilde{f}</span></li>
+<li>estimation: <span class="math inline">\tilde{f}-\hat{f}</span></li>
+<li>total: <span class="math inline">f^* - \hat{f}</span></li>
+</ul>
+<h3 id="parametric-models">Parametric models</h3>
+<p>In a parametric model: <span class="math inline">f=f_\theta</span>, so only an estimation of the parameter <span class="math inline">\theta</span> is needed and <span class="math inline">\hat{f} = f_{\hat{\theta}}</span></p>
+<h4 id="maximum-likelihood-principle">Maximum Likelihood principle</h4>
+<p>Let <span class="math inline">p_\theta</span> be the estimated parametric distribution of <span class="math inline">y|x</span>, then its log-likelihood is defined by:</p>
+<p><span class="math display">
+\mathcal{L}(\theta) = \sum_{i=0}^n \ln{p_\theta(y_i|x_i)}
+</span></p>
+<p>The corresponding MLE estimator is: <span class="math inline">\hat{\theta} = \arg \max_{\theta} \mathcal{L(\theta)}</span></p>
+<p>MLE can be seen as a particular case of risk minimization, with <span class="math inline">L(f_\theta(x), y)=-\ln{p_\theta(y|x)}</span> (for a <span class="math inline">L^2</span> loss, with a linear model and a normal error, the Least-square model naturally appears). And we have:</p>
+<p><span class="math display">
+R_{emp}(f_\theta, \mathcal{D}_n) = - \frac{1}{n} \sum_{i=0}^n \ln{p_\theta(y_i|x_i)}
+</span></p>
+<p><span class="math display">
+R(f_\theta) = \mathbb{E}(-\ln{p_\theta(Y|X)})
+</span></p>
+<p><span class="math display">
+R(f_\theta) - R(f^*) = \text{KL}(p_\theta, p^*)
+</span></p>
+<h4 id="loss-minimization">Loss minimization</h4>
+<p>So, minimizing the risk (or maximizing the likelihood) often leads to a problem of the form:</p>
+<p><span class="math display">
+\min_\theta \frac{1}{n} \sum_{i=1}^{n} L( f_\theta(x_i), y_i ) + \lambda C(\theta)
+</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">L</span> is a loss function</li>
+<li><span class="math inline">f_\theta</span> is the prediction function (<span class="math inline">\theta</span> is the parameter to optimize)</li>
+<li><span class="math inline">C</span> is a regularization function and <span class="math inline">\lambda</span> a regularization factor</li>
+</ul>
+<h5 id="linear-case">Linear case</h5>
+<p>Here the model are linear, <span class="math inline">f_\theta(x) = \theta^Tx</span>. For this kind of mdel, Fenchel duality can be used to simply express the dual problem, which can be exploited for the kernel trick.</p>
+<table>
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 62%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Primal</th>
+<th>Dual</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\min_\theta \frac{1}{n} \sum_{i=1}^{n} L(y_i, \theta^Tx_i) + C(\theta)</span></td>
+<td><span class="math inline">\max_\alpha \frac{1}{n} \sum_{i=1}^{n} -L^{\#}(y_i,-\alpha_i ) - C^{\#}(\sum_{i=1}^{n} \alpha_i x_i)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Where <span class="math inline">L^\#</span> and <span class="math inline">C^\#</span> are the convex conjugate of <span class="math inline">L</span> (for the second variable) and <span class="math inline">C</span> (defined by <span class="math inline">f^\#(a) = \max_z (za - f(z))</span>). And <span class="math inline">x_i^\#(\cdot)</span> is the adjoint operator of <span class="math inline">(\cdot^Tx_i)</span> (<span class="math inline">{\theta^T}^\# = \overline{\theta}</span>)</p>
+<p>It can be shown that if <span class="math inline">\hat{\theta}</span> and <span class="math inline">\hat{\alpha}</span> are the optimal solutions of those problems, then we have: <span class="math display">
+P(\hat{\theta}) = P(\theta(\hat{\alpha})) = D(\hat{\alpha})
+</span></p>
+<h5 id="the-kernel-trick-for-non-linear-models">The kernel trick for non-linear models</h5>
+<p>When there are only scalar products between data in the problem (which is the case for the dual in general), one can use the kernel trick. For a mapping <span class="math inline">\phi</span> of the data in another space, the scalar product can be computed using a well chosen kernel function (symmetric and positive semi-definite, Mercer theorem)</p>
+<p><span class="math display">
+k(x,y) = \phi(x) \cdot \phi(y)
+</span></p>
+<p>Common kernels:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th><span class="math inline">k(x,y)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Linear</td>
+<td><span class="math inline">x^Ty</span></td>
+</tr>
+<tr class="even">
+<td>Polynomial</td>
+<td><span class="math inline">(r+x^Ty)^p</span></td>
+</tr>
+<tr class="odd">
+<td>Gaussian</td>
+<td><span class="math inline">\exp(-\frac{||x-y||^2}{2 \sigma ^2})</span></td>
+</tr>
+<tr class="even">
+<td>Exponential</td>
+<td><span class="math inline">\exp(-\alpha ||x-y||)</span></td>
+</tr>
+<tr class="odd">
+<td>tanh</td>
+<td><span class="math inline">\tanh(\alpha x^Ty + c)</span></td>
+</tr>
+</tbody>
+</table>
+<h5 id="algorithms-to-solve-the-minimization-problem">Algorithms to solve the minimization problem</h5>
+<p>We note:</p>
+<ul>
+<li><span class="math inline">J_i(\theta) = L( f_\theta(x_i), y_i ) + n\lambda C(\theta)</span></li>
+<li><span class="math inline">J(\theta) = \frac{1}{n} \sum_i J_i(\theta)</span></li>
+</ul>
+<p>Descent methods (<span class="math inline">i_k</span> is a random index):</p>
+<table>
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 25%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>type</th>
+<th>update rule</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>FG</td>
+<td>primal</td>
+<td><span class="math inline">\theta \leftarrow \theta - \gamma \nabla_\theta J(\theta)</span></td>
+</tr>
+<tr class="even">
+<td>SGD</td>
+<td>primal</td>
+<td><span class="math inline">\theta \leftarrow \theta - \gamma \nabla_\theta J_{i_k}(\theta)</span></td>
+</tr>
+<tr class="odd">
+<td>Newton</td>
+<td>primal</td>
+<td><span class="math inline">\theta \leftarrow \theta - Hess^{-1}_\theta(J)\nabla_\theta J(\theta)</span></td>
+</tr>
+<tr class="even">
+<td>SAG</td>
+<td>primal</td>
+<td><span class="math inline">\theta \leftarrow \theta - \frac{\gamma}{n} \sum_i(\nabla_\theta J_{i_k}(\theta) \mathbb{1}_{i=i_k}+y_i\mathbb{1}_{i\neq i_k})</span></td>
+</tr>
+</tbody>
+</table>
+<p>Other algorithms:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>type</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>BFGS</td>
+<td>primal</td>
+</tr>
+<tr class="even">
+<td>SMO</td>
+<td>dual</td>
+</tr>
+<tr class="odd">
+<td>SDCA</td>
+<td>primal-dual</td>
+</tr>
+</tbody>
+</table>
+<p>To solve a linear system: conjugate gradient</p>
+<h4 id="loss-functions-and-corresponding-problems">Loss functions and corresponding problems:</h4>
+<p>A loss function is defined by:</p>
+<p><span class="math display">
+L: \mathcal{Y} \times \mathcal{Y} \rightarrow [0, +\infty )
+</span></p>
+<p>Detailed loss function theory in <em>How to compare different loss functions and their risks.</em></p>
+<h5 id="glm-generalized-linear-models">GLM (Generalized Linear Models)</h5>
+<p>General linear models are defined by the following assumptions on data:</p>
+<ul>
+<li>Exponential family (cf table): <span class="math inline">p_\theta(y|x) = b(y) \exp{(\chi T(y) - a(\eta))}</span></li>
+<li><span class="math inline">f_\theta(x) = \mathbb{E}_\theta(y|x)</span></li>
+<li><span class="math inline">\chi = \theta^Tx</span></li>
+</ul>
+<p>By writing the corresponding loglikelihood, these GLM leads to the most famous problems of Machine Learning (Least square regression, logistic regression, and softmax regression in particular, cf next subsections)</p>
+<table>
+<colgroup>
+<col style="width: 15%" />
+<col style="width: 20%" />
+<col style="width: 22%" />
+<col style="width: 32%" />
+<col style="width: 9%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Distribution</th>
+<th><span class="math inline">\chi</span></th>
+<th><span class="math inline">T(y)</span></th>
+<th><span class="math inline">a(\chi)</span></th>
+<th><span class="math inline">b(y)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Bernoulli</td>
+<td><span class="math inline">\ln{\frac{\mu}{1-\mu}}</span></td>
+<td><span class="math inline">y</span></td>
+<td><span class="math inline">\ln(1+e^{\chi})</span></td>
+<td><span class="math inline">1</span></td>
+</tr>
+<tr class="even">
+<td>Gaussian</td>
+<td><span class="math inline">\mu</span></td>
+<td><span class="math inline">y</span></td>
+<td><span class="math inline">\frac{\chi^2}{2}</span></td>
+<td><span class="math inline">\frac{1}{\sqrt{2\pi}} \exp(\frac{-y^2}{2})</span></td>
+</tr>
+<tr class="odd">
+<td>Poisson</td>
+<td><span class="math inline">\ln{\mu}</span></td>
+<td><span class="math inline">y</span></td>
+<td><span class="math inline">\exp{\chi}</span></td>
+<td><span class="math inline">\frac{1}{y!}</span></td>
+</tr>
+<tr class="even">
+<td>Geometric</td>
+<td><span class="math inline">\ln{(1-\mu)}</span></td>
+<td><span class="math inline">y</span></td>
+<td><span class="math inline">\ln \frac{e^\chi}{1-e^\chi}</span></td>
+<td><span class="math inline">1</span></td>
+</tr>
+<tr class="odd">
+<td>Multinomial (<span class="math inline">k</span> classes)</td>
+<td><span class="math inline">[\ln\frac{\mu_i}{\mu_k}]_{i&lt;k}</span></td>
+<td><span class="math inline">T(i) = (0...1...0)</span> (defined on integers between 0 and k-1, 1 in the i-th position)</td>
+<td><span class="math inline">-\ln(\mu_k)</span></td>
+<td><span class="math inline">1</span></td>
+</tr>
+</tbody>
+</table>
+<h5 id="binary-classification">Binary classification</h5>
+<p>Binary classifier: <span class="math inline">g: \mathcal{X} \rightarrow \{-1,1\}</span></p>
+<p>In general, <span class="math inline">g</span> is decomposed as: <span class="math inline">g(x) = sgn(f(x))</span>, with:</p>
+<ul>
+<li><span class="math inline">f(x) = h(\eta(x))</span>, the predictor
+<ul>
+<li><span class="math inline">h: [0,1] \rightarrow \mathbb{R}</span> a link function</li>
+<li><span class="math inline">\eta(x) = \mathbb{P}_{Y | X}(1 | x)</span>, the learned probability</li>
+</ul></li>
+</ul>
+<p>The optimal link function <span class="math inline">h^*</span> can generaly be obtained analiticaly, so classification problems are reduced to find an estimation <span class="math inline">\hat{\eta}</span> of <span class="math inline">\eta</span>.</p>
+<p><strong>To do so, one can set: <span class="math inline">f(x) = f_\theta(x)</span> (<span class="math inline">=\theta^Tx</span> most of the time), minimize the empirical risk (using the corresponding loss), and deduce an optimal predictor <span class="math inline">\hat{h}</span>, and <span class="math inline">\hat{\eta}(x) = h^{*-1}(\hat{h}(x))</span></strong></p>
+<h6 id="threshold">Threshold</h6>
+<p>With <span class="math inline">\hat{\eta}(x)</span>, a valable classifier can be <span class="math inline">tresh(\hat{\eta}(x))</span>, with a threshold <span class="math inline">t</span>.</p>
+<p>For classification problem, loss can be written: <span class="math inline">L(y,x) = \phi(yh(x))</span> (margin-based loss functions)</p>
+<p>The corresponding conditionnal risk: <span class="math inline">C_\phi(\eta, h) = \eta \phi(h) + (1-\eta) \phi(-h)</span></p>
+<table>
+<colgroup>
+<col style="width: 8%" />
+<col style="width: 14%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 22%" />
+<col style="width: 12%" />
+<col style="width: 18%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th><span class="math inline">\phi(v)</span></th>
+<th><span class="math inline">h^*_\phi(\eta)</span></th>
+<th><span class="math inline">h^{*-1}_\phi(v)</span></th>
+<th><span class="math inline">C^*_\phi(\eta)</span></th>
+<th><span class="math inline">L^{\#}(y,-a)</span></th>
+<th>properties</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">0/1</span></td>
+<td><span class="math inline">sgn(v)</span></td>
+<td><span class="math inline">sgn(2\eta -1)</span></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Not used in practise because <span class="math inline">NP</span> hard</td>
+</tr>
+<tr class="even">
+<td>square</td>
+<td><span class="math inline">(1-v)^2</span></td>
+<td><span class="math inline">2\eta -1</span></td>
+<td><span class="math inline">\frac{1}{2}(v+1)</span></td>
+<td><span class="math inline">4\eta(1-\eta)</span></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>modified LS</td>
+<td><span class="math inline">\max(1-v,0)^2</span></td>
+<td><span class="math inline">2\eta -1</span></td>
+<td>NA</td>
+<td><span class="math inline">4\eta(1-\eta)</span></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>SVM</td>
+<td><span class="math inline">\max(1-v,0)</span></td>
+<td><span class="math inline">sgn(2\eta-1)</span></td>
+<td>NA</td>
+<td><span class="math inline">1-|2\eta -1 |</span></td>
+<td><span class="math inline">-ay</span></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Boosting</td>
+<td><span class="math inline">e^{-v}</span></td>
+<td><span class="math inline">\frac{1}{2} \ln \frac{\eta}{1-\eta}</span></td>
+<td><span class="math inline">\frac{e^{2v}}{1+e^{2v}}</span></td>
+<td><span class="math inline">2 \sqrt{\eta(1-\eta)}</span></td>
+<td></td>
+<td>The loss of a mis-prediction increases exponentially with the value of <span class="math inline">-v</span></td>
+</tr>
+<tr class="even">
+<td>Logistic</td>
+<td><span class="math inline">\ln(1+e^{-v})</span></td>
+<td><span class="math inline">\ln \frac{\eta}{1-\eta}</span></td>
+<td><span class="math inline">\frac{e^v}{1+e^v}</span></td>
+<td><span class="math inline">-\eta \ln{\eta} - (1-\eta) \ln{(1-\eta)}</span></td>
+<td><span class="math inline">ay \ln{ay} + (1-ay) \ln(1-ay)</span></td>
+<td>It is a GLM (for Bernoulli distribution), equivalent to cross-entropy loss</td>
+</tr>
+<tr class="odd">
+<td>Savage</td>
+<td><span class="math inline">\frac{1}{(1+e^v)^2}</span></td>
+<td><span class="math inline">\ln \frac{\eta}{1-\eta}</span></td>
+<td><span class="math inline">\frac{e^v}{1+e^v}</span></td>
+<td><span class="math inline">\eta(1-\eta)</span></td>
+<td></td>
+<td> non-convex, better for outliers</td>
+</tr>
+<tr class="even">
+<td>Tangent</td>
+<td><span class="math inline">(2 \arctan(v)-1)^2</span></td>
+<td><span class="math inline">\tan(\eta - \frac{1}{2})</span></td>
+<td><span class="math inline">\arctan(v) + \frac{1}{2}</span></td>
+<td><span class="math inline">4\eta(1-\eta)</span></td>
+<td></td>
+<td> non-convex, better for outliers</td>
+</tr>
+</tbody>
+</table>
+<p><img src="plots/classification.svg" /></p>
+<h5 id="multilabel-classification">Multilabel classification</h5>
+<h6 id="softmax">Softmax</h6>
+<p>It is built from multinomial GLM. Inversing its link function gives:</p>
+<p><span class="math display">
+\phi_i = \frac{e^{\eta_i}}{\sum_{j=1}^k e^{\eta_i}}
+</span></p>
+<p>The corresponding predictor:</p>
+<p><span class="math display">
+h_\theta(x) = (\frac{e^{\theta_i^T x}}{\sum_{j=1}^k e^{\theta_j^T x}})
+</span></p>
+<p>And the log Likelihood to maximize:</p>
+<p><span class="math display">
+l(\theta) = \sum_{i=0}^n \ln( \prod_{l=1}^k \frac{e^{\theta_l^T x_i}}{\sum_{j=1}^k e^{\theta_j^T x_i}})^{\mathbb{1}_{y_i = l}}
+</span></p>
+<p>The minimization problem is therefor:</p>
+<p><span class="math display">
+\min_\theta - \sum_{i=0}^n y_i \ln(\frac{e^{\theta_l^T x_i}}{\sum_{j=1}^k e^{\theta_j^T x_i}})
+</span></p>
+<h5 id="regression">Regression</h5>
+<table>
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 35%" />
+<col style="width: 25%" />
+<col style="width: 27%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th><span class="math inline">L(y,x)</span></th>
+<th><span class="math inline">L^\#(y,-a)</span></th>
+<th>properties</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>square</td>
+<td><span class="math inline">(y-x)^2</span></td>
+<td><span class="math inline">-ay + \frac{a^2}{4}</span></td>
+<td>estimates mean label, sensitive to outliers, differentiable everywhere</td>
+</tr>
+<tr class="even">
+<td>absolute</td>
+<td><span class="math inline">|y-x|</span></td>
+<td><span class="math inline">-ay</span></td>
+<td>estimates median label, less sensitive to noise, not differentiable in 0</td>
+</tr>
+<tr class="odd">
+<td>Huber</td>
+<td> <span class="math inline">\frac{1}{2} (y-x)^2</span> if <span class="math inline">|x-y| &lt; \delta</span>, <span class="math inline">\delta(|y-x| - \frac{\delta}{2})</span> otherwise</td>
+<td></td>
+<td>“Best of Both Worlds” of Squared and Absolute Loss , Takes on behavior of Squared-Loss when loss is small, and Absolute Loss when loss is large. Once differentiable</td>
+</tr>
+<tr class="even">
+<td>log-ch</td>
+<td><span class="math inline">\ln(\cosh(y-x))</span></td>
+<td></td>
+<td>Similar to Huber Loss, but twice differentiable everywhere</td>
+</tr>
+</tbody>
+</table>
+<p><img src="plots/reg.svg" /></p>
+<h5 id="regularizations">Regularizations</h5>
+<table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 21%" />
+<col style="width: 51%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th><span class="math inline">C(w)</span></th>
+<th>properties</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">L^2</span></td>
+<td><span class="math inline">||w||^2_2</span></td>
+<td>strictly convex (1 solution), differentiable, but relies on all features (dense solution)</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">L^1</span></td>
+<td><span class="math inline">||w||_1</span></td>
+<td>convex, not differentiable, but performs feature selection (sparse solution)</td>
+</tr>
+<tr class="odd">
+<td>Elastic net</td>
+<td><span class="math inline">\alpha ||w||_1 + (1-\alpha)||w||^2_2</span></td>
+<td>strictly convex, not differentialbe</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">L^p</span> (often <span class="math inline">0&lt;p&lt;1</span>)</td>
+<td><span class="math inline">||w||_p</span></td>
+<td>non convex, very sparse solutions, initialization dependant, not differentiable</td>
+</tr>
+</tbody>
+</table>
+<h5 id="focus-on-linear-regression">Focus on linear regression</h5>
+<table>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>loss</th>
+<th>regularizer</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>OLS (ordinary least square)</td>
+<td>square</td>
+<td> NA</td>
+<td><span class="math inline">\theta = (xx^T)^{-1}xy^T</span></td>
+</tr>
+<tr class="even">
+<td>Ridge regression</td>
+<td>square</td>
+<td><span class="math inline">L^2</span></td>
+<td><span class="math inline">\theta = (xx^T + \lambda I)^{-1}xy^T</span></td>
+</tr>
+<tr class="odd">
+<td>Lasso regression</td>
+<td>square</td>
+<td><span class="math inline">L^1</span></td>
+<td>no analytical, sub gradient descent</td>
+</tr>
+</tbody>
+</table>
+<h3 id="non-parametric-models">Non parametric models</h3>
+<h4 id="k-nn">k-NN</h4>
+<p>The k-NN predictor estimates <span class="math inline">f</span> directly by: <span class="math display">
+f_k(x) = \frac{1}{k} \sum_{x_i \in N_k(x)} y_i
+</span></p>
+<p>where <span class="math inline">N_k(x)</span> is the neigbourhood of <span class="math inline">x</span> defined by its <span class="math inline">k</span> closest points according to a metric to define (euclidian, sin…). Note that an appropriate metric can be learned itself from the dataset, using metric learning algoritms like LMNN (cf <a href="http://researchers.lille.inria.fr/abellet/talks/metric_learning_tutorial_CIL.pdf">here</a> for more precisions on metric learning).</p>
+<h4 id="kernel-regression">Kernel regression</h4>
+<p>In kernel regression, the estimator is (to understand from where it comes, go to kernel density estimation, because this estimator comes from the estimation of the distribution):</p>
+<p><span class="math display">
+f(x) = \frac{1}{n} \sum_{i=1}^{n} w_i y_i \text{  where  } w_i = \frac{n K(\frac{||x_i-x||}{b})}{\sum_{j=1}^n K(\frac{||x_j-x||}{b})}
+</span></p>
+<p>where <span class="math inline">K</span> is a kernel function (not the same as previously !), usually: <span class="math inline">K(z) = \frac{1}{\sqrt{2\pi}} \exp(\frac{-z^2}{2})</span> (see kernel density estimation for more)</p>
+<h4 id="tree-based-models">Tree-based models</h4>
+<h5 id="decision-trees">Decision trees</h5>
+<p>Decision tree can serve for regression and classification.</p>
+<p>Decision tree algorithm are generally based on the same procedure:</p>
+<blockquote>
+<ol type="1">
+<li>Start at the root node with all training instances</li>
+<li>Select an attribute on the basis of splitting criteria (Gain Ratio or other impurity metrics, discussed below)</li>
+<li>Partition instances according to selected attribute recursively</li>
+</ol>
+</blockquote>
+<p>There are mainly two “impurity metrics” (here <span class="math inline">D</span> is a dataset and <span class="math inline">p_i</span> is the fraction of elements of class i in the set):</p>
+<ul>
+<li>Gini: <span class="math inline">I_G(D) = 1 - \sum_{i=1}^{|D|} p_i^2</span></li>
+<li>Shannon: <span class="math inline">I_E(D) = -\sum_{i=1}^{|D|} p_i \log_2 p_i</span></li>
+</ul>
+<p>Decision tree building algorithm: CART; ID3; Good refrence (in French !) for CART <a href="https://math.unice.fr/~malot/presCART.pdf">here</a>, will be summarized in the future</p>
+<h5 id="random-forests">Random forests</h5>
+<p>Random forests applies the general technique of bootstrap aggregating to tree learners.</p>
+<p>The dataset is splitted in <span class="math inline">B</span> parts. On each a random tree is trained, and the final predictor has the form:</p>
+<p><span class="math display">
+f(x) = \frac{1}{B} \sum_{b=1}^B f_b(x)
+</span></p>
+<p>where <span class="math inline">f_b</span> is the predictor of the <span class="math inline">b</span>-th tree.</p>
+<p>The uncertainty of the prediction can be estimated by: <span class="math display">
+\sigma = \sqrt{\frac{\sum_b (f_b(x)-f(x))^2}{B-1}}
+</span></p>
+<h3 id="neural-networks">Neural networks</h3>
+<p>A neural network is a model of the form <span class="math inline">y=f_{NN}(x)</span>, where <span class="math inline">f_{NN}</span> is a nested function.</p>
+<h4 id="mlp-multi-layer-perceptron">MLP (Multi Layer Perceptron)</h4>
+<p><img src="img/ffnn.svg" /></p>
+<p>In a multilayer perceptron (with <span class="math inline">L</span> layers) we have:</p>
+<p><span class="math display">
+f_{NN} = f_1 \circ f_2 \ldots f_L
+</span></p>
+<p>and: <span class="math inline">f_l(a) = \sigma_l(w^{(l)} a)</span>, with <span class="math inline">\sigma</span> an activation function (cf table behind).</p>
+<table>
+<thead>
+<tr class="header">
+<th>Activation function</th>
+<th><span class="math inline">\sigma(x)</span></th>
+<th><span class="math inline">\sigma&#39;(x)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Identity</td>
+<td><span class="math inline">x</span></td>
+<td><span class="math inline">1</span></td>
+</tr>
+<tr class="even">
+<td>Binary step</td>
+<td><span class="math inline">\mathbb{1}_{\{x \geq 0\}}</span></td>
+<td><span class="math inline">0</span> on <span class="math inline">x \neq 0</span>, undefined in <span class="math inline">0</span></td>
+</tr>
+<tr class="odd">
+<td>Logistic</td>
+<td><span class="math inline">\frac{1}{1+e^{-x}}</span></td>
+<td><span class="math inline">\sigma(x)(1-\sigma(x))</span></td>
+</tr>
+<tr class="even">
+<td>tanh</td>
+<td><span class="math inline">\tanh(x)</span></td>
+<td><span class="math inline">1-\sigma(x)^2</span></td>
+</tr>
+<tr class="odd">
+<td>arctan</td>
+<td><span class="math inline">\tan^{-1}(x)</span></td>
+<td><span class="math inline">\frac{1}{1+x^2}</span></td>
+</tr>
+<tr class="even">
+<td>ReLu</td>
+<td><span class="math inline">x\mathbb{1}_{\{x \geq 0\}}</span></td>
+<td><span class="math inline">\mathbb{1}_{\{x \geq 0\}}</span></td>
+</tr>
+<tr class="odd">
+<td>PReLu</td>
+<td><span class="math inline">\alpha x\mathbb{1}_{\{x \geq 0\}}</span></td>
+<td><span class="math inline">\alpha \mathbb{1}_{\{x \geq 0\}}</span></td>
+</tr>
+</tbody>
+</table>
+<h5 id="backpropagation">Backpropagation</h5>
+<p>To train a MLP, we use a classic loss function and a gradient descent. But, as the global expression is complicated, we will use properties from the chain rule to compute partial derivatives and apply backpropagation to them.</p>
+<p>Notations:</p>
+<ul>
+<li><span class="math inline">C</span> the total loss function</li>
+<li><span class="math inline">a^{(l)} = \sigma_l(z^{(l)})</span></li>
+<li><span class="math inline">z^{(l)} = w^{(l)} a^{(l-1)}</span></li>
+</ul>
+<p>We have: <span class="math display">
+\frac{\partial C}{\partial w^{(l)}} = \frac{\partial C}{\partial z^{(l)}} \frac{\partial z^{(l)}}{\partial w^{(l)}} = \frac{\partial C}{\partial z^{(l)}} {a^{(l-1)}}^T
+</span></p>
+<p>But:</p>
+<p><span class="math display">
+\frac{\partial C}{\partial z^{(l)}} = \frac{\partial C}{\partial z^{(l+1)}} \frac{\partial z^{(l+1)}}{\partial a^{(l)}} \frac{\partial a^{(l)}}{\partial z^{(l)}} = ({w^{(l+1)}}^T \frac{\partial C}{\partial z^{(l+1)}}) \sigma &#39;(z^{(l)})
+</span></p>
+<p>And: <span class="math display">
+\frac{\partial C}{\partial z^{(L)}} = \frac{\partial C}{\partial a^{(L)}} \sigma &#39;(z^{(L)})
+</span></p>
+<p>So, to compute <span class="math inline">\frac{\partial C}{\partial w^{(l)}}</span>, one can do:</p>
+<blockquote>
+<ol type="1">
+<li>Forwarding: give an input to the network and sore the values of <span class="math inline">a^{(l)}</span></li>
+<li>Compute loss</li>
+<li>Backpropagation: compute <span class="math inline">\frac{\partial C}{\partial w^{(L)}}</span>, <span class="math inline">\frac{\partial C}{\partial w^{(L-1)}}</span>, …, <span class="math inline">\frac{\partial C}{\partial w^{(l+1)}}</span> by using the formulas above, and deduce <span class="math inline">\frac{\partial C}{\partial w^{(l)}}</span> by recurrence</li>
+</ol>
+</blockquote>
+<p>Then, a classical descent algorithm can be applied to update weights.</p>
+<h4 id="cnn">CNN</h4>
+<p><img src="img/cnn.svg" /></p>
+<p>NN have a lo t of parameters to deal with, and when the input data is already in a big dimension space (typically images), it is impossible to train it in reasonable time. The trick is to select only usefull information in the entry by applying dimension reduction with convolution operations. To do so, we add a convolution layer at the beginning of the network, often fllowed by a pooling operation to reduce even more the dimension.</p>
+<p>So, in a CNN:</p>
+<p><span class="math display">
+f_{NN} = (f_1 \circ f_2 \ldots \circ f_L) \circ (pool_K \circ conv_K \circ \ldots \circ pool_1 \circ conv_1)
+</span></p>
+<h5 id="backpropagation-1">Backpropagation</h5>
+<p>The fully-connected layers follow the same rules as an MLP, with: <span class="math inline">a^{(0)}</span> being the output of the last pooling.</p>
+<p>For a pooling layer (<span class="math inline">o = pool(i)</span>) we have:</p>
+<p><span class="math display">
+\frac{\partial C}{\partial i} = \mathcal{1}_{\{ \text{max pixel} \}} \frac{\partial C}{\partial o}
+</span></p>
+<p>And for a conv layer (<span class="math inline">o = conv(\text{image},\text{filter})</span>), as <span class="math inline">\frac{\partial o(i,j)}{\partial \text{filter}(x,y)}=\text{image}(i,j)</span>:</p>
+<p><span class="math display">
+\frac{\partial C}{\partial \text{filter}(x,y)} = \sum_i \sum_j \frac{\partial C}{\partial o(i,j)} \text{image}(i,j)
+</span></p>
+<h4 id="rnn">RNN</h4>
+<h3 id="model-performance-assessment-and-model-selection">Model Performance assessment, and model selection</h3>
+<h4 id="bias-variance-tradeoff">Bias-variance tradeoff</h4>
+<p>Model selection consists in optimizing a model family or canditates (tuning the hyperparameters) To perform model selection, the dataset <span class="math inline">\mathcal{D}_n</span> is splitted in three subsets:</p>
+<ul>
+<li>Training: <span class="math inline">\mathcal{D}_{train}</span></li>
+<li>Validation: <span class="math inline">\mathcal{D}_{val}</span></li>
+<li>Test: <span class="math inline">\mathcal{D}_{test}</span></li>
+</ul>
+<p>The model is trained with the train set, so the estimator of <span class="math inline">f</span> depends of <span class="math inline">\mathcal{D}_{train}</span> and we note: <span class="math inline">\hat{f}(x) = \hat{f}(x, \mathcal{D})</span></p>
+<p>We define:</p>
+<ul>
+<li>The generalization error: <span class="math inline">E(f, \mathcal{D}_{train}) = \mathbb{E}_{XY}((\hat{f}(x, \mathcal{D}_{train})-Y)^2)</span></li>
+<li>The expected generalization error: <span class="math inline">E = \mathbb{E}_{\mathcal{D}_{train}}(E(\mathcal{D}_{train}, n))</span></li>
+</ul>
+<p>IT can be shown that: <span class="math display">
+E = \mathbb{E}_{XY}((Y-\overline{Y}(X))^2) + \mathbb{E}_{X}\mathbb{E}_{\mathcal{D}_{train}}((\overline{f}(X)-\hat{f}(X,\mathcal{D}_{train}))^2) + \mathbb{E}_{X}((\overline{Y}(X)-\overline{f}(X))^2) = \text{noise} + \text{variance} + \text{bias}^2
+</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\overline{f}(X) = \mathbb{E}_{\mathcal{D}_{train}}(\hat{f}(x,\mathcal{D}_{train}))</span></li>
+<li><span class="math inline">\mathbb{E}_{XY} Y = \mathbb{E}_{X} \mathbb{E}_{Y|X} Y = \mathbb{E}_{X} \overline{Y}(X)</span></li>
+<li>noise: This term measures the variability within the data, not considering any model, vannot be reducesd.</li>
+<li>variance: measures the model variability with respect to changing training sets, can be reduced by using less complex models, but this can increase the bias (underfitting)</li>
+<li>bias: measures the inherent error that you obtain from your model, even with infinite training data, can be reduced by using more complex models, but this can increase the variance (overfitting).</li>
+</ul>
+<h5 id="overfitting-and-underfitting">Overfitting and underfitting</h5>
+<p>Of course, in practice we xan’t estimate <span class="math inline">E</span> because the real model is unknown. That’s why we define the estimator, using another sample <span class="math inline">\mathcal{D}</span>: <span class="math display">
+E_{\mathcal{D}} = \frac{1}{|\mathcal{D}|} \sum_{x_i \in \mathcal{D}} L(y_i, \hat{f}(x_i,\mathcal{D}_{train}))
+</span></p>
+<p>Naturally we define:</p>
+<ul>
+<li>training error: <span class="math inline">E_{train} = E_{\mathcal{D}_{train}}</span></li>
+<li>validation error: <span class="math inline">E_{val} = E_{\mathcal{D}_{val}}</span></li>
+<li>test error: <span class="math inline">E_{test} = E_{\mathcal{D}_{test}}</span></li>
+</ul>
+<p><strong>Overfitting</strong>: A model with complexity c is called overfitting if, for the test error of this model, the following holds: <span class="math display">
+E_{test}(c) - E_{test}(c_{opt}) &gt; 0 \text{,  } \forall c &gt; c_{opt}
+</span></p>
+<p><strong>Underfitting</strong>: A model with complexity c is called underfitting if, for the test error of this model, the following holds: <span class="math display">
+E_{test}(c) - E_{test}(c_{opt}) &gt; 0 \text{,  } \forall c &lt; c_{opt}
+</span></p>
+<p><strong>good generalization capabilities</strong>: A model with complexity c has good generalization capabilities, if, for the test error of this model, the following holds: <span class="math display">
+E_{test}(c) - E_{train}(c) &lt; \delta \text{,  } \delta \in \mathbb{R}^+
+</span></p>
+<h4 id="regression-1">Regression</h4>
+<h5 id="model-evaluation">Model evaluation</h5>
+<p>We define (and we have: <span class="math inline">\text{SST} = \text{SSE} + \text{SSR}</span>):</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Total sum of squares</th>
+<th>Explained sum of squares</th>
+<th>Residual sum of squares</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\text{SST} = \sum_i (y_i - \overline{y})^2</span></td>
+<td><span class="math inline">\text{SSE} = \sum_i (f(x_i) - \overline{y})^2</span></td>
+<td><span class="math inline">\text{SSR} = \sum_i (y_i - f(x_i))^2</span></td>
+</tr>
+</tbody>
+</table>
+<p>Multiple indicators can be used to evaluate regression goodness of fit (<span class="math inline">p</span> is the number of explanatory variables in the model (not including the constant term)):</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Indicator</th>
+<th>Expression</th>
+<th>Comments</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>MSE</td>
+<td><span class="math inline">\frac{\text{SSE}}{n}</span></td>
+<td>The mean square error</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">R^2</span></td>
+<td><span class="math inline">1 - \frac{\text{SSE}}{\text{SST}}</span></td>
+<td>measure of how well the model explains the variance of the response variables. A disadvantage of <span class="math inline">R^2</span> is that a submodel of a full model always has a smaller value, regardless of its quality.</td>
+</tr>
+<tr class="odd">
+<td>adjusted <span class="math inline">R^2</span></td>
+<td><span class="math inline">1 - \frac{\text{SSE}(n-1)}{\text{SST}(n-p)}</span></td>
+<td>To compensate the disavantage of <span class="math inline">R^2</span></td>
+</tr>
+<tr class="even">
+<td>Mallows Cp</td>
+<td><span class="math inline">\text{MSE} + \frac{2}{n} \hat{\sigma}^2(p+1)</span></td>
+<td>^2 is an estimation of the variance assotiated to each response. It is the amount by which the in-sample error underestimates the out-sample error. Hence, a large value of the optimism indicates a large discrepancy between both errors.</td>
+</tr>
+<tr class="odd">
+<td>AIC</td>
+<td><span class="math inline">2((n+2)-\mathcal{L})</span></td>
+<td>(<span class="math inline">\mathcal{L}</span> is the maximum log likelihood, for the computed estimator)</td>
+</tr>
+<tr class="even">
+<td>BIC</td>
+<td><span class="math inline">\log(n)(p+2)-2\mathcal{L}</span></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h5 id="model-selection">Model selection</h5>
+<p>Best subset selection, Forward Stepwise Selection, Backward Stepwise Selection, Cross-Validation…</p>
+<h4 id="classification">Classification</h4>
+<h5 id="model-evaluation-1">Model evaluation</h5>
+<p>For classification, we define the confusion matrix (cf figure), where <span class="math inline">p_{ij}</span> is the proportion of instances estimated to be in class number <span class="math inline">i</span> by the classifier when they actually belong to class number <span class="math inline">j</span></p>
+<p><img src="img/confusion.svg" /></p>
+<p>For a class <span class="math inline">i</span> we define:</p>
+<ul>
+<li><span class="math inline">p_{TP} = p_{ii}</span></li>
+<li><span class="math inline">p_{FN} = p_{\cdot i} - p_{ii}</span></li>
+<li><span class="math inline">p_{FP} = p_{i} - p_{ii}</span></li>
+<li><span class="math inline">p_{TN} = 1 - p_{TP} - p_{FN} - p_{FP}</span></li>
+</ul>
+<p>To estimate the good of fit of a classifier one can compute the measures:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Measure</th>
+<th>expression</th>
+<th>comments</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Overall Success Rate (OSR)</td>
+<td><span class="math inline">OSR = \sum_{i=1}^K p_{ii}</span></td>
+<td>corresponds to the observed proportion of correctly classified instances.</td>
+</tr>
+<tr class="even">
+<td>TP-Rate of a class</td>
+<td><span class="math inline">TPR_i = \frac{p_{TP}}{p_{TP}+p_{FN}}</span></td>
+<td>proportion of instances belonging to the considered class and actually classified as such.</td>
+</tr>
+<tr class="odd">
+<td>TN-Rate of a class</td>
+<td><span class="math inline">TNR_i = \frac{p_{TN}}{p_{TN}+p_{FP}}</span></td>
+<td>proportion of instances not belonging to the considered class and actually classified as such.</td>
+</tr>
+<tr class="even">
+<td>Positive Predictive Value of a class</td>
+<td><span class="math inline">PPV_i = \frac{p_{TP}}{p_{TP}+p_{FP}}</span></td>
+<td>corresponds to the proportion of instances predicted to belong (resp. not to belong) to the considered class, and which indeed do</td>
+</tr>
+<tr class="odd">
+<td>Negative Predictive Value of a class</td>
+<td><span class="math inline">NPV_i = \frac{p_{TN}}{p_{TN}+p_{FN}}</span></td>
+<td>corresponds to the proportion of instances predicted not to belong to the considered class, and which indeed do not</td>
+</tr>
+<tr class="even">
+<td>F-measure</td>
+<td><span class="math inline">F_i = 2 \frac{PPV_i \times TPR_i}{PPV_i + TPR_i} = \frac{2p_{TP}}{2p_{TP}+p_{FN}+p_{FP}}</span></td>
+<td>can be interpreted as a measure of overlapping between the true and estimated classes (other instances, i.e. TN, are ignored), ranging from 0 (no overlap at all to 1 (complete overlap)</td>
+</tr>
+<tr class="odd">
+<td>Jaccard coefficient of community</td>
+<td><span class="math inline">JJC_i = \frac{p_{TP}}{p_{TP}+p_{FP}+p_{FN}} = \frac{F_i}{2-F_i}</span></td>
+<td>can be interpreted as the ratio of the estimated and true classes intersection to their union (in terms of set cardinality). It ranges from 0 (no overlap) to 1 (complete overlap)</td>
+</tr>
+<tr class="even">
+<td>Classification Success Index</td>
+<td><span class="math inline">ICSI_i = PPV_i + TPR_i -1</span></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h5 id="model-selection-1">Model selection</h5>
+<p>To set the threshold <span class="math inline">t</span> of decision, plot the ROC curve: <span class="math inline">p_{TP} = p_{FP}(t)</span> and selection the one that maximaze the AUC (Area Under the Curve)</p>
+<h2 id="generative-models">Generative models</h2>
+<ul>
+<li>naive Bayes classifier</li>
+</ul>
+<h2 id="graphical-models">Graphical models</h2>
+<ul>
+<li>Bayesian network</li>
+<li>Hidden Markov model</li>
+<li>Markov random field</li>
+<li>linear discriminant analysis</li>
+<li>Gaussian Mixture Model</li>
+<li>Restricted Boltzmann machine</li>
+</ul></div>
+            <div class="d-none d-xl-block col-xl-2 bd-toc">
+               <ul class="section-nav">
+                  <li class="toc-entry"><ul>
+<li><a href="#data-representation">Data representation</a>
+<ul>
+<li><a href="#definitions">Definitions</a></li>
+<li><a href="#pre-treatments">Pre-treatments</a></li>
+<li><a href="#handling-missing-data">Handling missing data</a></li>
+<li><a href="#dimensionality-reduction">Dimensionality reduction</a></li>
+</ul></li>
+<li><a href="#loss-and-risk-functions">Loss and risk functions</a></li>
+<li><a href="#discriminative-models">Discriminative models</a>
+<ul>
+<li><a href="#parametric-models">Parametric models</a></li>
+<li><a href="#non-parametric-models">Non parametric models</a></li>
+<li><a href="#neural-networks">Neural networks</a></li>
+<li><a href="#model-performance-assessment-and-model-selection">Model Performance assessment, and model selection</a></li>
+</ul></li>
+<li><a href="#generative-models">Generative models</a></li>
+<li><a href="#graphical-models">Graphical models</a></li>
+</ul></li>
+               </ul>
+            </div>
+         </div>
+               </div>
+            <!-- Add comment hosting service here -->
+            <!-- Footer -->
+            <footer class="footer text-muted">
+               <div align="center">
+                  <!-- Update licences -->
+                  Content is available under <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a>
+                  &nbsp;|&nbsp;
+                  Sourcecode licensed under <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" target="_blank" rel="noopener">GPL-3.0</a>
+                  <br />
+                  <!-- Please keep the following line -->
+                  Built with <a href="https://www.pandoc.org" target="_blank" rel="noopener">Pandoc</a> 
+                  using <a href="https://github.com/ashki23/pandoc-bootstrap" target="_blank" rel="noopener">pandoc-bootstrap</a> theme
+                  <br />
+                  <!-- Update copyright -->
+                  Copyright, Author Name
+               </div>
+            </footer>
+            <!-- Add global site tag (gtag.js) and site analytics here -->
+            <!-- JS, Popper.js, and jQuery -->
+      <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+      <!-- Mathjax -->
+      <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script>
+         /* Bootstrap styles to tables */
+         function bootstrapStylePandocTables() {
+         $('tr.header').parent('thead').parent('table').addClass('table table-condensed'); }
+         $(document).ready(function () { bootstrapStylePandocTables(); });
+         /* Adjust the height when click the toc */
+         var shiftWindow = function() { scrollBy(0, -60) };
+         window.addEventListener("hashchange", shiftWindow);
+         function load() { if (window.location.hash) shiftWindow(); }
+      </script>
+   </body>
+</html>
