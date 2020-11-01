@@ -67,22 +67,35 @@ When some feature values are missing from the dataset, one can:
 
 Finally, if the dataset dimension is too big, the optimization will be slow because of the curse of dimensionnality. One way to accelerate the training is to reduce dimensionnality, by keeping the maximum of information using PCA or other algorithms.
 
-## Discriminative models
 
-In discriminative problems, we have a labelized sample $\mathcal{D}_n = \{(x_i, y_i) \in \mathcal{X}\times\mathcal{Y}\}$, from $p_{XY}$, and we want to directly determine $p(y | x)$
+## Loss and risk functions
 
-### Loss and risk functions
+In Machine Learning, we make assumption on data:
 
-Goal of a machine learning algorthm: find function $f$ that can predict new values with the best accuracy.
+$$
+Y = f(X) + \epsilon
+$$
 
-+ Loss function $L(y_{pred},y)$: measure the error of the predictor.
-+ Risk function $R(f) = \mathbb{E}_{XY}(L(Y,f(X)))$
-+ Empirical risk function $R_{emp}(f) = \frac{1}{n} \sum_i L(y_i, f(x_i))$
+with $\epsilon$ iid zero mean noise.
+
+The goal is to estimate $f$, to do so let introduce:
+
++ Loss function $L(y,y_{pred})$: measure the error of the predictor.
++ Risk function $R(f) = \mathbb{E}_{XY}(L(Y,f(X))) = \mathbb{E}_{X}(\mathbb{E}_{Y|X}(L(Y,f(X)) | X))$
+
 
 The problem real solution is
 $$
 f^* = \arg \min_f R(f)
 $$
+
+
+## Discriminative models
+
+In discriminative problems, we have a labelized sample $\mathcal{D}_n = \{(x_i, y_i) \in \mathcal{X}\times\mathcal{Y}\}$, from $p_{XY}$, and we want to directly determine $p(y | x)$
+
+
+Let's introduce empirical risk function: $R_{emp}(f, \mathcal{D}_n) = \frac{1}{n} \sum_i L(y_i, f(x_i))$, an estimator of $R(f)$
 
 To solve the problem, we chose a restricted set of possible function $\mathcal{F}$ (either parametric model, either not). We note:
 $$
@@ -91,7 +104,7 @@ $$
 
 As we only have a sample $\mathcal{D_n}$ of the distribution $p_{XY}$, which is unknown, in practise we compute:
 $$
-\hat{f} = \arg \min_{f \in \mathcal{F}} R_{emp}(f)
+\hat{f} = \arg \min_{f \in \mathcal{F}} R_{emp}(f, \mathcal{D}_n)
 $$
 
 Errors:
@@ -101,32 +114,27 @@ Errors:
 + total: $f^* - \hat{f}$
 
 
+
+
+
 ### Parametric models
 
+In a parametric model: $f=f_\theta$, so only an estimation of the parameter $\theta$ is needed and $\hat{f} = f_{\hat{\theta}}$
+
 #### Maximum Likelihood principle
-
-In Machine Learning, most of the time we make assumption on data:
-
-$$
-y = f_\theta(x) + \epsilon
-$$
-
-with $\epsilon$ iid zero mean noise.
-
-So : $y \sim F(f_\theta(x))$
 
 Let $p_\theta$ be the estimated parametric distribution of $y|x$, then its log-likelihood is defined by:
 
 $$
-\mathcal{L}(f_\theta) = \sum_{i=0}^n \ln{p_\theta(y_i|x_i)}
+\mathcal{L}(\theta) = \sum_{i=0}^n \ln{p_\theta(y_i|x_i)}
 $$
 
-The corresponding MLE estimator is: $\hat{f_\theta} = \arg \max_{\theta} \mathcal{L(f_\theta)}$
+The corresponding MLE estimator is: $\hat{\theta} = \arg \max_{\theta} \mathcal{L(\theta)}$
 
 MLE can be seen as a particular case of risk minimization, with $L(f_\theta(x), y)=-\ln{p_\theta(y|x)}$  (for a $L^2$ loss, with a linear model and a normal error, the Least-square model naturally appears). And we have:
 
 $$
-R_{emp}(f_\theta) = - \frac{1}{n} \sum_{i=0}^n \ln{p_\theta(y_i|x_i)}
+R_{emp}(f_\theta, \mathcal{D}_n) = - \frac{1}{n} \sum_{i=0}^n \ln{p_\theta(y_i|x_i)}
 $$
 
 $$
@@ -257,6 +265,9 @@ In general, $g$ is decomposed as: $g(x) = sgn(f(x))$, with:
 The optimal link function $h^*$ can generaly be obtained analiticaly, so classification problems are reduced to find an estimation $\hat{\eta}$ of $\eta$.
 
 **To do so, one can set: $f(x) = f_\theta(x)$ ($=\theta^Tx$ most of the time), minimize the empirical risk (using the corresponding loss), and deduce an optimal predictor $\hat{h}$, and $\hat{\eta}(x) = h^{*-1}(\hat{h}(x))$**
+
+###### Threshold
+With $\hat{\eta}(x)$, a valable classifier can be $tresh(\hat{\eta}(x))$, with a threshold $t$.
 
 For classification problem, loss can be written: $L(y,x) = \phi(yh(x))$ (margin-based loss functions)
 
@@ -393,11 +404,11 @@ $$
 \sigma = \sqrt{\frac{\sum_b (f_b(x)-f(x))^2}{B-1}}
 $$
 
-## Neural networks
+### Neural networks
 
 A neural network is a model of the form $y=f_{NN}(x)$, where $f_{NN}$ is a nested function.
 
-### MLP (Multi Layer Perceptron)
+#### MLP (Multi Layer Perceptron)
 
 ![](img/ffnn.svg)
 
@@ -420,7 +431,7 @@ and: $f_l(a) = \sigma_l(w^{(l)} a)$, with $\sigma$ an activation function (cf ta
 |PReLu| $\alpha x\mathbb{1}_{\{x \geq 0\}}$ | $\alpha \mathbb{1}_{\{x \geq 0\}}$
 
 
-#### Backpropagation
+##### Backpropagation
 
 To train a MLP, we use a classic loss function and a gradient descent. But, as the global expression is complicated, we will use properties from the chain rule to compute partial derivatives and apply backpropagation to them.
 
@@ -454,7 +465,7 @@ So, to compute $\frac{\partial C}{\partial w^{(l)}}$, one can do:
 
 Then, a classical descent algorithm can be applied to update weights.
 
-### CNN
+#### CNN
 
 ![](img/cnn.svg)
 
@@ -467,7 +478,7 @@ $$
 f_{NN} = (f_1 \circ f_2 \ldots \circ f_L) \circ (pool_K \circ conv_K \circ \ldots \circ pool_1 \circ conv_1)
 $$
 
-#### Backpropagation
+##### Backpropagation
 
 The fully-connected layers follow the same rules as an MLP, with: $a^{(0)}$ being the output of the last pooling.
 
@@ -485,17 +496,131 @@ $$
 
 
 
-### RNN
+#### RNN
+
+
+### Model Performance assessment, and model selection
+
+#### Regression
+
+##### Bias-variance tradeoff
+
+Model selection consists in optimizing a model family or canditates (tuning the hyperparameters)
+To perform model selection, the dataset $\mathcal{D}_n$ is splitted in three subsets:
+
++ Training: $\mathcal{D}_{train}$
++ Validation: $\mathcal{D}_{val}$
++ Test: $\mathcal{D}_{test}$
+
+The model is trained with the train set, so the estimator of $f$ depends of $\mathcal{D}_{train}$ and we note: $\hat{f}(x) = \hat{f}(x, \mathcal{D})$
+
+We define:
+
++ The generalization error: $E(f, \mathcal{D}_{train}) = \mathbb{E}_{XY}((\hat{f}(x, \mathcal{D}_{train})-Y)^2)$
++ The expected generalization error: $E = \mathbb{E}_{\mathcal{D}_{train}}(E(\mathcal{D}_{train}, n))$
+
+IT can be shown that:
+$$
+E = \mathbb{E}_{XY}((Y-\overline{Y}(X))^2) + \mathbb{E}_{X}\mathbb{E}_{\mathcal{D}_{train}}((\overline{f}(X)-\hat{f}(X,\mathcal{D}_{train}))^2) + \mathbb{E}_{X}((\overline{Y}(X)-\overline{f}(X))^2) = \text{noise} + \text{variance} + \text{bias}^2
+$$
+
+where:
+
++ $\overline{f}(X) = \mathbb{E}_{\mathcal{D}_{train}}(\hat{f}(x,\mathcal{D}_{train}))$
++ $\mathbb{E}_{XY} Y = \mathbb{E}_{X} \mathbb{E}_{Y|X} Y = \mathbb{E}_{X} \overline{Y}(X)$
++ noise: This term measures the variability within the data, not considering any model, vannot be reducesd.
++ variance: measures the model variability with respect to changing training sets, can be reduced by using less complex models, but this can increase the bias (underfitting)
++ bias: measures the inherent error that you obtain from your model, even with infinite
+training data, can be reduced by using more complex models, but this can increase the variance (overfitting).
+
+##### Overfitting and underfitting
+
+Of course, in practice we xan't estimate $E$ because the real model is unknown. That's why we define the estimator, using another sample $\mathcal{D}$:
+$$
+E_{\mathcal{D}} = \frac{1}{|\mathcal{D}|} \sum_{x_i \in \mathcal{D}} L(y_i, \hat{f}(x_i,\mathcal{D}_{train}))
+$$
+
+Naturally we define:
+
++ training error: $E_{train} = E_{\mathcal{D}_{train}}$
++ validation error: $E_{val} = E_{\mathcal{D}_{val}}$
++ test error: $E_{test} = E_{\mathcal{D}_{test}}$
+
+
+
+**Overfitting**: A model with complexity c is called overfitting if, for the test error of this
+model, the following holds:
+$$
+E_{test}(c) - E_{test}(c_{opt}) > 0 \text{,  } \forall c > c_{opt}
+$$
+
+**Underfitting**: A model with complexity c is called underfitting if, for the test error of
+this model, the following holds:
+$$
+E_{test}(c) - E_{test}(c_{opt}) > 0 \text{,  } \forall c < c_{opt}
+$$
+
+**good generalization capabilities**: A model with complexity c has good generalization capabilities, if, for the test error of this
+model, the following holds:
+$$
+E_{test}(c) - E_{train}(c) < \delta \text{,  } \delta \in \mathbb{R}^+
+$$
+
+##### Model evaluation
+
+We define (and we have: $\text{SST} = \text{SSE} + \text{SSR}$):
+
+|Total sum of squares | Explained sum of squares | Residual sum of squares
+|--|--|--
+|$\text{SST} = \sum_i (y_i - \overline{y})^2$ | $\text{SSE} = \sum_i (f(x_i) - \overline{y})^2$ | $\text{SSR} = \sum_i (y_i - f(x_i))^2$
+
+
+Multiple indicators can be used to evaluate regression goodness of fit ($p$ is the number of explanatory variables in the model (not including the constant term)):
+
+|Indicator | Expression | Comments
+|--|--|--
+|MSE | $\frac{\text{SSE}}{n}$ | The mean square error
+|$R^2$ |$1 - \frac{\text{SSE}}{\text{SST}}$ | measure of how well the model explains the variance of the response variables. A disadvantage of $R^2$ is that a submodel of a full model always has a smaller value, regardless of its quality.
+|adjusted $R^2$ | $1 - \frac{\text{SSE}(n-1)}{\text{SST}(n-p)}$ | To compensate the disavantage of $R^2$
+| Mallows Cp | $\text{MSE} + \frac{2}{n} \hat{\sigma}^2(p+1)$ | \hat{\sigma}^2 is an estimation of the variance assotiated to each response. It is the amount by which the in-sample error underestimates the out-sample error. Hence, a large value of the optimism indicates a large discrepancy between both errors.
+|AIC | $2((n+2)-\mathcal{L})$ | ($\mathcal{L}$ is the maximum log likelihood, for the computed estimator)
+|BIC |$\log(n)(p+2)-2\mathcal{L}$ |
+
+##### Model selection
+
+Best subset selection, Forward Stepwise Selection, Backward Stepwise Selection, Cross-Validation...
+
+#### Classification
+
+##### Model evaluation
+
+
+For classification, we define the confusion matrix (cf figure), where $p_{ij}$ is the proportion of instances estimated to be in class number $i$ by the classifier when they actually belong to class number $j$
+
+![](img/confusion.svg)
+
+For a class $i$ we define:
+
++ $p_{TP} = p_{ii}$
++ $p_{FN} = p_{\cdot i} - p_{ii}$
++ $p_{FP} = p_{i} - p_{ii}$
++ $p_{TN} = 1 - p_{TP} - p_{FN} - p_{FP}$
+
+To estimate the good of fit of a classifier one can compute the measures:
+
+|Measure | expression | comments
+|--|--|--|
+|Overall Success Rate (OSR) | $OSR = \sum_{i=1}^K p_{ii}$ | corresponds to the observed proportion of correctly classified instances.
+|TP-Rate of a class | $TPR_i = \frac{p_{TP}}{p_{TP}+p_{FN}}$ | proportion of instances belonging to the considered class and actually classified as such.
+|TN-Rate of a class | $TNR_i = \frac{p_{TN}}{p_{TN}+p_{FP}}$ | proportion of instances not belonging to the considered class and actually classified as such.
+|Positive Predictive Value of a class | $PPV_i = \frac{p_{TP}}{p_{TP}+p_{FP}}$ | corresponds to the proportion of instances predicted to belong (resp. not to belong) to the considered class, and which indeed do
+|Negative Predictive Value of a class | $NPV_i = \frac{p_{TN}}{p_{TN}+p_{FN}}$ | corresponds to the proportion of instances predicted not to belong to the considered class, and which indeed do not
+|F-measure | $F_i = 2 \frac{PPV_i \times TPR_i}{PPV_i + TPR_i} = \frac{2p_{TP}}{2p_{TP}+p_{FN}+p_{FP}}$ | can be interpreted as a measure of overlapping between the true and estimated classes (other instances, i.e. TN, are ignored), ranging from 0 (no overlap at all to 1 (complete overlap)
+|Jaccard coefficient of community | $JJC_i = \frac{p_{TP}}{p_{TP}+p_{FP}+p_{FN}} = \frac{F_i}{2-F_i}$ | can be interpreted as the ratio of the estimated and true classes intersection to their union (in terms of set cardinality). It ranges from 0 (no overlap) to 1 (complete overlap)
+|Classification Success Index| $ICSI_i = PPV_i + TPR_i -1$ |
+
+##### Model selection
+
+To set the threshold  $t$ of decision, plot the ROC curve: $p_{TP} = p_{FP}(t)$ and selection the one that maximaze the AUC (Area Under the Curve)
 
 ## Generative models
-
-## Graphical models
-
-
-## Model validation
-
-TO-DO
-
-## Learning algorithm selection
-
-TO-DO
