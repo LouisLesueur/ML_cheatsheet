@@ -106,7 +106,7 @@
 </ul>
 <h3 id="dimensionality-reduction">Dimensionality reduction</h3>
 <p>Finally, if the dataset dimension is too big, the optimization will be slow because of the curse of dimensionnality. One way to accelerate the training is to reduce dimensionnality, by keeping the maximum of information using PCA or other algorithms.</p>
-<h2 id="discriminative-problems">Discriminative problems</h2>
+<h2 id="discriminative-models">Discriminative models</h2>
 <p>In discriminative problems, we have a labelized sample <span class="math inline">\mathcal{D}_n = \{(x_i, y_i) \in \mathcal{X}\times\mathcal{Y}\}</span>, from <span class="math inline">p_{XY}</span>, and we want to directly determine <span class="math inline">p(y | x)</span></p>
 <h3 id="loss-and-risk-functions">Loss and risk functions</h3>
 <p>Goal of a machine learning algorthm: find function <span class="math inline">f</span> that can predict new values with the best accuracy.</p>
@@ -740,7 +740,8 @@ f_{NN} = (f_1 \circ f_2 \ldots \circ f_L) \circ (pool_K \circ conv_K \circ \ldot
 \frac{\partial C}{\partial \text{filter}(x,y)} = \sum_i \sum_j \frac{\partial C}{\partial o(i,j)} \text{image}(i,j)
 </span></p>
 <h3 id="rnn">RNN</h3>
-<h2 id="generative-problems">Generative Problems</h2>
+<h2 id="generative-models">Generative models</h2>
+<h2 id="graphical-models">Graphical models</h2>
 <h2 id="model-validation">Model validation</h2>
 <p>TO-DO</p>
 <h2 id="learning-algorithm-selection">Learning algorithm selection</h2>
@@ -755,7 +756,7 @@ f_{NN} = (f_1 \circ f_2 \ldots \circ f_L) \circ (pool_K \circ conv_K \circ \ldot
 <li><a href="#handling-missing-data">Handling missing data</a></li>
 <li><a href="#dimensionality-reduction">Dimensionality reduction</a></li>
 </ul></li>
-<li><a href="#discriminative-problems">Discriminative problems</a>
+<li><a href="#discriminative-models">Discriminative models</a>
 <ul>
 <li><a href="#loss-and-risk-functions">Loss and risk functions</a></li>
 <li><a href="#parametric-models">Parametric models</a></li>
@@ -767,7 +768,8 @@ f_{NN} = (f_1 \circ f_2 \ldots \circ f_L) \circ (pool_K \circ conv_K \circ \ldot
 <li><a href="#cnn">CNN</a></li>
 <li><a href="#rnn">RNN</a></li>
 </ul></li>
-<li><a href="#generative-problems">Generative Problems</a></li>
+<li><a href="#generative-models">Generative models</a></li>
+<li><a href="#graphical-models">Graphical models</a></li>
 <li><a href="#model-validation">Model validation</a></li>
 <li><a href="#learning-algorithm-selection">Learning algorithm selection</a></li>
 </ul></li>

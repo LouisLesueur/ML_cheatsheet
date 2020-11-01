@@ -67,7 +67,7 @@ When some feature values are missing from the dataset, one can:
 
 Finally, if the dataset dimension is too big, the optimization will be slow because of the curse of dimensionnality. One way to accelerate the training is to reduce dimensionnality, by keeping the maximum of information using PCA or other algorithms.
 
-## Discriminative problems
+## Discriminative models
 
 In discriminative problems, we have a labelized sample $\mathcal{D}_n = \{(x_i, y_i) \in \mathcal{X}\times\mathcal{Y}\}$, from $p_{XY}$, and we want to directly determine $p(y | x)$
 
@@ -487,7 +487,10 @@ $$
 
 ### RNN
 
-## Generative Problems
+## Generative models
+
+## Graphical models
+
 
 ## Model validation
 
