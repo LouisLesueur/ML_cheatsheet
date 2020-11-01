@@ -589,7 +589,10 @@ Multiple indicators can be used to evaluate regression goodness of fit ($p$ is t
 
 ##### Model selection
 
-Best subset selection, Forward Stepwise Selection, Backward Stepwise Selection, Cross-Validation...
++ Best subset selection
++ Forward Stepwise Selection
++ Backward Stepwise Selection
++ Cross-Validation
 
 #### Classification
 
