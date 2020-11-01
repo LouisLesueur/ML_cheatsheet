@@ -346,6 +346,16 @@ $$
 
 where $N_k(x)$ is the neigbourhood of $x$ defined by its $k$ closest points according to a metric to define (euclidian, sin...). Note that an appropriate metric can be learned itself from the dataset, using metric learning algoritms like LMNN (cf [here](http://researchers.lille.inria.fr/abellet/talks/metric_learning_tutorial_CIL.pdf) for more precisions on metric learning).
 
+#### Kernel regression
+
+In kernel regression, the estimator is (to understand from where it comes, go to kernel density estimation, because this estimator comes from the estimation of the distribution):
+
+$$
+f(x) = \frac{1}{n} \sum_{i=1}^{n} w_i y_i \text{  where  } w_i = \frac{n K(\frac{||x_i-x||}{b})}{\sum_{j=1}^n K(\frac{||x_j-x||}{b})}
+$$
+
+where $K$ is a kernel function (not the same as previously !), usually: $K(z) = \frac{1}{\sqrt{2\pi}} \exp(\frac{-z^2}{2})$ (see kernel density estimation for more)
+
 #### Tree-based models
 
 ##### Decision trees
@@ -387,18 +397,97 @@ $$
 
 A neural network is a model of the form $y=f_{NN}(x)$, where $f_{NN}$ is a nested function.
 
-### FFNN
+### MLP (Multi Layer Perceptron)
 
 ![](img/ffnn.svg)
 
+In a multilayer perceptron (with $L$ layers) we have:
+
+$$
+f_{NN} = f_1 \circ f_2 \ldots f_L
+$$
+
+and: $f_l(a) = \sigma_l(w^{(l)} a)$, with $\sigma$ an activation function (cf table behind).
+
+|Activation function | $\sigma(x)$ | $\sigma'(x)$
+|--|--|--|
+|Identity|$x$|$1$
+|Binary step|$\mathbb{1}_{\{x \geq 0\}}$| $0$ on $x \neq 0$, undefined in $0$
+|Logistic| $\frac{1}{1+e^{-x}}$ | $\sigma(x)(1-\sigma(x))$
+|tanh| $\tanh(x)$ | $1-\sigma(x)^2$
+|arctan| $\tan^{-1}(x)$ | $\frac{1}{1+x^2}$
+|ReLu| $x\mathbb{1}_{\{x \geq 0\}}$ | $\mathbb{1}_{\{x \geq 0\}}$
+|PReLu| $\alpha x\mathbb{1}_{\{x \geq 0\}}$ | $\alpha \mathbb{1}_{\{x \geq 0\}}$
+
+
+#### Backpropagation
+
+To train a MLP, we use a classic loss function and a gradient descent. But, as the global expression is complicated, we will use properties from the chain rule to compute partial derivatives and apply backpropagation to them.
+
+Notations:
+
++ $C$ the total loss function
++ $a^{(l)} = \sigma_l(z^{(l)})$
++ $z^{(l)} = w^{(l)} a^{(l-1)}$
+
+We have:
+$$
+\frac{\partial C}{\partial w^{(l)}} = \frac{\partial C}{\partial z^{(l)}} \frac{\partial z^{(l)}}{\partial w^{(l)}} = \frac{\partial C}{\partial z^{(l)}} {a^{(l-1)}}^T
+$$
+
+But:
+
+$$
+\frac{\partial C}{\partial z^{(l)}} = \frac{\partial C}{\partial z^{(l+1)}} \frac{\partial z^{(l+1)}}{\partial a^{(l)}} \frac{\partial a^{(l)}}{\partial z^{(l)}} = ({w^{(l+1)}}^T \frac{\partial C}{\partial z^{(l+1)}}) \sigma '(z^{(l)})
+$$
+
+And:
+$$
+\frac{\partial C}{\partial z^{(L)}} = \frac{\partial C}{\partial a^{(L)}} \sigma '(z^{(L)})
+$$
+
+So, to compute $\frac{\partial C}{\partial w^{(l)}}$, one can do:
+
+> 1. Forwarding: give an input to the network and sore the values of $a^{(l)}$
+> 2. Compute loss
+> 3. Backpropagation: compute $\frac{\partial C}{\partial w^{(L)}}$, $\frac{\partial C}{\partial w^{(L-1)}}$, ..., $\frac{\partial C}{\partial w^{(l+1)}}$ by using the formulas above, and deduce $\frac{\partial C}{\partial w^{(l)}}$ by recurrence
+
+Then, a classical descent algorithm can be applied to update weights.
 
 ### CNN
+
+![](img/cnn.svg)
+
+
+NN have a lo t of parameters to deal with, and when the input data is already in a big dimension space (typically images), it is impossible to train it in reasonable time. The trick is to select only usefull information in the entry by applying dimension reduction with convolution operations. To do so, we add a convolution layer at the beginning of the network, often fllowed by a pooling operation to reduce even more the dimension.
+
+So, in a CNN:
+
+$$
+f_{NN} = (f_1 \circ f_2 \ldots \circ f_L) \circ (pool_K \circ conv_K \circ \ldots \circ pool_1 \circ conv_1)
+$$
+
+#### Backpropagation
+
+The fully-connected layers follow the same rules as an MLP, with: $a^{(0)}$ being the output of the last pooling.
+
+For a pooling layer ($o = pool(i)$) we have:
+
+$$
+\frac{\partial C}{\partial i} = \mathcal{1}_{\{ \text{max pixel} \}} \frac{\partial C}{\partial o}
+$$
+
+And for a conv layer ($o = conv(\text{image},\text{filter})$), as $\frac{\partial o(i,j)}{\partial \text{filter}(x,y)}=\text{image}(i,j)$:
+
+$$
+\frac{\partial C}{\partial \text{filter}(x,y)} = \sum_i \sum_j \frac{\partial C}{\partial o(i,j)} \text{image}(i,j)
+$$
+
+
 
 ### RNN
 
 ## Generative Problems
-
-TO-DO
 
 ## Model validation
 

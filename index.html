@@ -607,6 +607,12 @@ l(\theta) = \sum_{i=0}^n \ln( \prod_{l=1}^k \frac{e^{\theta_l^T x_i}}{\sum_{j=1}
 f_k(x) = \frac{1}{k} \sum_{x_i \in N_k(x)} y_i
 </span></p>
 <p>where <span class="math inline">N_k(x)</span> is the neigbourhood of <span class="math inline">x</span> defined by its <span class="math inline">k</span> closest points according to a metric to define (euclidian, sin…). Note that an appropriate metric can be learned itself from the dataset, using metric learning algoritms like LMNN (cf <a href="http://researchers.lille.inria.fr/abellet/talks/metric_learning_tutorial_CIL.pdf">here</a> for more precisions on metric learning).</p>
+<h4 id="kernel-regression">Kernel regression</h4>
+<p>In kernel regression, the estimator is (to understand from where it comes, go to kernel density estimation, because this estimator comes from the estimation of the distribution):</p>
+<p><span class="math display">
+f(x) = \frac{1}{n} \sum_{i=1}^{n} w_i y_i \text{  where  } w_i = \frac{n K(\frac{||x_i-x||}{b})}{\sum_{j=1}^n K(\frac{||x_j-x||}{b})}
+</span></p>
+<p>where <span class="math inline">K</span> is a kernel function (not the same as previously !), usually: <span class="math inline">K(z) = \frac{1}{\sqrt{2\pi}} \exp(\frac{-z^2}{2})</span> (see kernel density estimation for more)</p>
 <h4 id="tree-based-models">Tree-based models</h4>
 <h5 id="decision-trees">Decision trees</h5>
 <p>Decision tree can serve for regression and classification.</p>
@@ -636,12 +642,105 @@ f(x) = \frac{1}{B} \sum_{b=1}^B f_b(x)
 </span></p>
 <h2 id="neural-networks">Neural networks</h2>
 <p>A neural network is a model of the form <span class="math inline">y=f_{NN}(x)</span>, where <span class="math inline">f_{NN}</span> is a nested function.</p>
-<h3 id="ffnn">FFNN</h3>
+<h3 id="mlp-multi-layer-perceptron">MLP (Multi Layer Perceptron)</h3>
 <p><img src="img/ffnn.svg" /></p>
+<p>In a multilayer perceptron (with <span class="math inline">L</span> layers) we have:</p>
+<p><span class="math display">
+f_{NN} = f_1 \circ f_2 \ldots f_L
+</span></p>
+<p>and: <span class="math inline">f_l(a) = \sigma_l(w^{(l)} a)</span>, with <span class="math inline">\sigma</span> an activation function (cf table behind).</p>
+<table>
+<thead>
+<tr class="header">
+<th>Activation function</th>
+<th><span class="math inline">\sigma(x)</span></th>
+<th><span class="math inline">\sigma&#39;(x)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Identity</td>
+<td><span class="math inline">x</span></td>
+<td><span class="math inline">1</span></td>
+</tr>
+<tr class="even">
+<td>Binary step</td>
+<td><span class="math inline">\mathbb{1}_{\{x \geq 0\}}</span></td>
+<td><span class="math inline">0</span> on <span class="math inline">x \neq 0</span>, undefined in <span class="math inline">0</span></td>
+</tr>
+<tr class="odd">
+<td>Logistic</td>
+<td><span class="math inline">\frac{1}{1+e^{-x}}</span></td>
+<td><span class="math inline">\sigma(x)(1-\sigma(x))</span></td>
+</tr>
+<tr class="even">
+<td>tanh</td>
+<td><span class="math inline">\tanh(x)</span></td>
+<td><span class="math inline">1-\sigma(x)^2</span></td>
+</tr>
+<tr class="odd">
+<td>arctan</td>
+<td><span class="math inline">\tan^{-1}(x)</span></td>
+<td><span class="math inline">\frac{1}{1+x^2}</span></td>
+</tr>
+<tr class="even">
+<td>ReLu</td>
+<td><span class="math inline">x\mathbb{1}_{\{x \geq 0\}}</span></td>
+<td><span class="math inline">\mathbb{1}_{\{x \geq 0\}}</span></td>
+</tr>
+<tr class="odd">
+<td>PReLu</td>
+<td><span class="math inline">\alpha x\mathbb{1}_{\{x \geq 0\}}</span></td>
+<td><span class="math inline">\alpha \mathbb{1}_{\{x \geq 0\}}</span></td>
+</tr>
+</tbody>
+</table>
+<h4 id="backpropagation">Backpropagation</h4>
+<p>To train a MLP, we use a classic loss function and a gradient descent. But, as the global expression is complicated, we will use properties from the chain rule to compute partial derivatives and apply backpropagation to them.</p>
+<p>Notations:</p>
+<ul>
+<li><span class="math inline">C</span> the total loss function</li>
+<li><span class="math inline">a^{(l)} = \sigma_l(z^{(l)})</span></li>
+<li><span class="math inline">z^{(l)} = w^{(l)} a^{(l-1)}</span></li>
+</ul>
+<p>We have: <span class="math display">
+\frac{\partial C}{\partial w^{(l)}} = \frac{\partial C}{\partial z^{(l)}} \frac{\partial z^{(l)}}{\partial w^{(l)}} = \frac{\partial C}{\partial z^{(l)}} {a^{(l-1)}}^T
+</span></p>
+<p>But:</p>
+<p><span class="math display">
+\frac{\partial C}{\partial z^{(l)}} = \frac{\partial C}{\partial z^{(l+1)}} \frac{\partial z^{(l+1)}}{\partial a^{(l)}} \frac{\partial a^{(l)}}{\partial z^{(l)}} = ({w^{(l+1)}}^T \frac{\partial C}{\partial z^{(l+1)}}) \sigma &#39;(z^{(l)})
+</span></p>
+<p>And: <span class="math display">
+\frac{\partial C}{\partial z^{(L)}} = \frac{\partial C}{\partial a^{(L)}} \sigma &#39;(z^{(L)})
+</span></p>
+<p>So, to compute <span class="math inline">\frac{\partial C}{\partial w^{(l)}}</span>, one can do:</p>
+<blockquote>
+<ol type="1">
+<li>Forwarding: give an input to the network and sore the values of <span class="math inline">a^{(l)}</span></li>
+<li>Compute loss</li>
+<li>Backpropagation: compute <span class="math inline">\frac{\partial C}{\partial w^{(L)}}</span>, <span class="math inline">\frac{\partial C}{\partial w^{(L-1)}}</span>, …, <span class="math inline">\frac{\partial C}{\partial w^{(l+1)}}</span> by using the formulas above, and deduce <span class="math inline">\frac{\partial C}{\partial w^{(l)}}</span> by recurrence</li>
+</ol>
+</blockquote>
+<p>Then, a classical descent algorithm can be applied to update weights.</p>
 <h3 id="cnn">CNN</h3>
+<p><img src="img/cnn.svg" /></p>
+<p>NN have a lo t of parameters to deal with, and when the input data is already in a big dimension space (typically images), it is impossible to train it in reasonable time. The trick is to select only usefull information in the entry by applying dimension reduction with convolution operations. To do so, we add a convolution layer at the beginning of the network, often fllowed by a pooling operation to reduce even more the dimension.</p>
+<p>So, in a CNN:</p>
+<p><span class="math display">
+f_{NN} = (f_1 \circ f_2 \ldots \circ f_L) \circ (pool_K \circ conv_K \circ \ldots \circ pool_1 \circ conv_1)
+</span></p>
+<h4 id="backpropagation-1">Backpropagation</h4>
+<p>The fully-connected layers follow the same rules as an MLP, with: <span class="math inline">a^{(0)}</span> being the output of the last pooling.</p>
+<p>For a pooling layer (<span class="math inline">o = pool(i)</span>) we have:</p>
+<p><span class="math display">
+\frac{\partial C}{\partial i} = \mathcal{1}_{\{ \text{max pixel} \}} \frac{\partial C}{\partial o}
+</span></p>
+<p>And for a conv layer (<span class="math inline">o = conv(\text{image},\text{filter})</span>), as <span class="math inline">\frac{\partial o(i,j)}{\partial \text{filter}(x,y)}=\text{image}(i,j)</span>:</p>
+<p><span class="math display">
+\frac{\partial C}{\partial \text{filter}(x,y)} = \sum_i \sum_j \frac{\partial C}{\partial o(i,j)} \text{image}(i,j)
+</span></p>
 <h3 id="rnn">RNN</h3>
 <h2 id="generative-problems">Generative Problems</h2>
-<p>TO-DO</p>
 <h2 id="model-validation">Model validation</h2>
 <p>TO-DO</p>
 <h2 id="learning-algorithm-selection">Learning algorithm selection</h2>
@@ -664,7 +763,7 @@ f(x) = \frac{1}{B} \sum_{b=1}^B f_b(x)
 </ul></li>
 <li><a href="#neural-networks">Neural networks</a>
 <ul>
-<li><a href="#ffnn">FFNN</a></li>
+<li><a href="#mlp-multi-layer-perceptron">MLP (Multi Layer Perceptron)</a></li>
 <li><a href="#cnn">CNN</a></li>
 <li><a href="#rnn">RNN</a></li>
 </ul></li>
