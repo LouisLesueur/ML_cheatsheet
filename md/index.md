@@ -620,10 +620,6 @@ To estimate the good of fit of a classifier one can compute the measures:
 |Jaccard coefficient of community | $JJC_i = \frac{p_{TP}}{p_{TP}+p_{FP}+p_{FN}} = \frac{F_i}{2-F_i}$ | can be interpreted as the ratio of the estimated and true classes intersection to their union (in terms of set cardinality). It ranges from 0 (no overlap) to 1 (complete overlap)
 |Classification Success Index| $ICSI_i = PPV_i + TPR_i -1$ |
 
-##### Model selection
-
-To set the threshold  $t$ of decision, plot the ROC curve: $p_{TP} = p_{FP}(t)$ and selection the one that maximaze the AUC (Area Under the Curve)
-
 ## Generative models
 
 + naive Bayes classifier
