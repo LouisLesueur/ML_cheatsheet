@@ -6,22 +6,22 @@ author: Louis Lesueur
 + Kernel density estimation and mean shift
 
 
-### Clustering
+## Clustering
 + hierarchical clustering
 + k-means
 + mixture models
 + DBSCAN
 + OPTICS algorithm
 
-### Anomaly detection
+## Anomaly detection
 + Local Outlier Factor
 + Isolation Forest
 
-### Dimenstion reduction
+## Dimenstion reduction
 + Principal component analysis
 + Independent component analysis
 
-### Neural Networks
+## Neural Networks
 + Autoencoders
 + Deep Belief Nets
 + Hebbian Learning
