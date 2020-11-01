@@ -25,7 +25,7 @@ plt.xlim(-1,2)
 plt.ylim(-2, 4)
 plt.title("Classification loss functions (y=1)")
 plt.legend()
-plt.savefig("plots/classification.svg")
+plt.savefig("docs/plots/classification.svg")
 
 
 # ----------------------------------------------------------------------------
@@ -43,4 +43,4 @@ plt.xlim(-1,3)
 plt.ylim(-0.5, 4.5)
 plt.title(r"Regression loss functions (y=1)")
 plt.legend()
-plt.savefig("plots/reg.svg")
+plt.savefig("docs/plots/reg.svg")
