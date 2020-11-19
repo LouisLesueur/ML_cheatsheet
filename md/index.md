@@ -251,39 +251,42 @@ By writing the corresponding loglikelihood, these GLM leads to the most famous p
 |Geometric    | $\ln{(1-\mu)}$              | $y$      | $\ln \frac{e^\chi}{1-e^\chi}$   | $1$
 | Multinomial ($k$ classes) | $[\ln\frac{\mu_i}{\mu_k}]_{i<k}$ | $T(i) = (0...1...0)$ (defined on integers between 0 and k-1, 1 in the i-th position) | $-\ln(\mu_k)$ | $1$
 
+##### Regression
+
+|Name  | $L(y,x)$        |$L^\#(y,-a)$ |  properties  |
+|----------|-----------------|------------|-----------------|
+|square| $(y-x)^2$       | $-ay + \frac{a^2}{4}$ |estimates mean label, sensitive to outliers, differentiable everywhere
+|absolute | $|y-x|$ | $-ay$ | estimates median label, less sensitive to noise, not differentiable in 0
+|Huber | $\frac{1}{2} (y-x)^2$ if $|x-y| < \delta$, $\delta(|y-x| - \frac{\delta}{2})$ otherwise | | "Best of Both Worlds" of Squared and Absolute Loss , Takes on behavior of Squared-Loss when loss is small, and Absolute Loss when loss is large.  Once differentiable
+|log-ch | $\ln(\cosh(y-x))$ | | Similar to Huber Loss, but twice differentiable everywhere
+
+![](plots/reg.svg)
 
 ##### Binary classification
 
-Binary classifier: $g: \mathcal{X} \rightarrow \{-1,1\}$
+In binary classification, $\mathcal{Y} = \{-1,1\}$. We note $g: \mathcal{X} \rightarrow \mathcal{Y}$ the classifier.
 
-In general, $g$ is decomposed as: $g(x) = sgn(f(x))$, with:
+###### Discrete classifiers
 
-+ $f(x) = h(\eta(x))$, the predictor
-  + $h: [0,1] \rightarrow \mathbb{R}$ a link function
-  + $\eta(x) = \mathbb{P}_{Y | X}(1 | x)$, the learned probability
+Discrete classifiers directly give the output estimated classe ($g(x) = sgn(f_\theta(x))$)
 
-The optimal link function $h^*$ can generaly be obtained analiticaly, so classification problems are reduced to find an estimation $\hat{\eta}$ of $\eta$.
+|Name  | $L(y,x)$        |$L^\#(y,-a)$ |  properties  |
+|----------|-----------------|------------|-----------------|
+| Bayes classifier ($0/1$ loss) | $\mathbb{1}_{x \neq y}$        |  | Even if it leads to the best theoretical classifier, it is not used in practice as the loss is not differentiable.
+| SVM  (hinge loss)             | $\max(1-yx,0)$   | $-ay$            | For a linear predictor, it is equivalent to cut the space with an hyperplan
 
-**To do so, one can set: $f(x) = f_\theta(x)$ ($=\theta^Tx$ most of the time), minimize the empirical risk (using the corresponding loss), and deduce an optimal predictor $\hat{h}$, and $\hat{\eta}(x) = h^{*-1}(\hat{h}(x))$**
+###### Continous classifiers
 
-###### Threshold
-With $\hat{\eta}(x)$, a valable classifier can be $tresh(\hat{\eta}(x))$, with a threshold $t$.
-
-For classification problem, loss can be written: $L(y,x) = \phi(yh(x))$ (margin-based loss functions)
-
-The corresponding conditionnal risk: $C_\phi(\eta, h) = \eta \phi(h) + (1-\eta) \phi(-h)$
+Continuous classifiers give an output in $[0,1]$ (often an estimation of $\eta(x)=\mathbb{P}(1|x)$, but not always !) and need to be thresholded. More details on classification losses can be found in various papers.
 
 
-|Name         |$\phi(v)$        |  $h^*_\phi(\eta)$                      | $h^{*-1}_\phi(v)$ | $C^*_\phi(\eta)$                             | $L^{\#}(y,-a)$ | properties
-|----------------|----------------------------|----------------------|----------------------|------------------------------------------|-----------------------|-----------------------------------|
-| $0/1$       | $sgn(v)$        | $sgn(2\eta -1)$              |               |                                              |                | Not used in practise because $NP$ hard
-| square      | $(1-v)^2$       | $2\eta -1$         |          $\frac{1}{2}(v+1)$          | $4\eta(1-\eta)$                              |                |
-| modified LS | $\max(1-v,0)^2$ | $2\eta -1$    | NA                         | $4\eta(1-\eta)$                              |                |
-| SVM         | $\max(1-v,0)$   | $sgn(2\eta-1)$     | NA                    | $1-|2\eta -1 |$                              | $-ay$            |
-| Boosting    | $e^{-v}$        | $\frac{1}{2} \ln \frac{\eta}{1-\eta}$ | $\frac{e^{2v}}{1+e^{2v}}$ | $2 \sqrt{\eta(1-\eta)}$                      |                | The loss of a mis-prediction increases exponentially with the value of $-v$
-| Logistic    | $\ln(1+e^{-v})$ | $\ln \frac{\eta}{1-\eta}$  | $\frac{e^v}{1+e^v}$           | $-\eta \ln{\eta} - (1-\eta) \ln{(1-\eta)}$ | $ay \ln{ay} + (1-ay) \ln(1-ay)$| It is a GLM (for Bernoulli distribution), equivalent to cross-entropy loss
-| Savage      | $\frac{1}{(1+e^v)^2}$ | $\ln \frac{\eta}{1-\eta}$ | $\frac{e^v}{1+e^v}$  | $\eta(1-\eta)$ | | non-convex, better for outliers
-| Tangent      | $(2 \arctan(v)-1)^2$ | $\tan(\eta - \frac{1}{2})$ | $\arctan(v) + \frac{1}{2}$ | $4\eta(1-\eta)$ | | non-convex, better for outliers
+|Name  | $L(y,x)$        |$L^\#(y,-a)$ |  properties  |
+|----------|-----------------|------------|-----------------|
+| square      | $(1-yx)^2$       |
+| Boosting    | $e^{-yx}$        | | The loss of a mis-prediction increases exponentially with the value of $-xy$
+| Logistic    | $\ln(1+e^{-yx})$ | $ay \ln{ay} + (1-ay) \ln(1-ay)$| It is a GLM (for Bernoulli distribution), equivalent to cross-entropy loss
+| Savage      | $\frac{1}{(1+e^yx)^2}$ | | non-convex, better for outliers
+| Tangent      | $(2 \arctan(yx)-1)^2$ | | non-convex, better for outliers
 
 ![](plots/classification.svg)
 
@@ -315,17 +318,6 @@ The minimization problem is therefor:
 $$
 \min_\theta - \sum_{i=0}^n y_i \ln(\frac{e^{\theta_l^T x_i}}{\sum_{j=1}^k e^{\theta_j^T x_i}})
 $$
-
-##### Regression
-
-|Name  | $L(y,x)$        |$L^\#(y,-a)$ |  properties  |
-|------|-----------------|------------|-------------|
-|square| $(y-x)^2$       | $-ay + \frac{a^2}{4}$ |estimates mean label, sensitive to outliers, differentiable everywhere
-|absolute | $|y-x|$ | $-ay$ | estimates median label, less sensitive to noise, not differentiable in 0
-|Huber | $\frac{1}{2} (y-x)^2$ if $|x-y| < \delta$, $\delta(|y-x| - \frac{\delta}{2})$ otherwise | | "Best of Both Worlds" of Squared and Absolute Loss , Takes on behavior of Squared-Loss when loss is small, and Absolute Loss when loss is large.  Once differentiable
-|log-ch | $\ln(\cosh(y-x))$ | | Similar to Huber Loss, but twice differentiable everywhere
-
-![](plots/reg.svg)
 
 ##### Regularizations
 
@@ -598,6 +590,7 @@ Multiple indicators can be used to evaluate regression goodness of fit ($p$ is t
 
 ##### Model evaluation
 
+###### Confusion matrix
 
 For classification, we define the confusion matrix (cf figure), where $p_{ij}$ is the proportion of instances estimated to be in class number $i$ by the classifier when they actually belong to class number $j$
 
@@ -622,6 +615,11 @@ To estimate the good of fit of a classifier one can compute the measures:
 |F-measure | $F_i = 2 \frac{PPV_i \times TPR_i}{PPV_i + TPR_i} = \frac{2p_{TP}}{2p_{TP}+p_{FN}+p_{FP}}$ | can be interpreted as a measure of overlapping between the true and estimated classes (other instances, i.e. TN, are ignored), ranging from 0 (no overlap at all to 1 (complete overlap)
 |Jaccard coefficient of community | $JJC_i = \frac{p_{TP}}{p_{TP}+p_{FP}+p_{FN}} = \frac{F_i}{2-F_i}$ | can be interpreted as the ratio of the estimated and true classes intersection to their union (in terms of set cardinality). It ranges from 0 (no overlap) to 1 (complete overlap)
 |Classification Success Index| $ICSI_i = PPV_i + TPR_i -1$ |
+
+###### ROC space
+
+For a continuous classifier, the selection of the best threshold can be done by plotting its performances in the ROC space (TP in function of FP), and chosing the threshold value which is closer to the ideal point.
+
 
 ## Generative models
 

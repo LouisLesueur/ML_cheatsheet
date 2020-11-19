@@ -13,7 +13,6 @@ plt.rcParams['text.usetex']=False
 
 x = np.linspace(-6,2,100)
 plt.figure(figsize=(15,5))
-plt.plot(x, np.sign(x), label="0/1")
 plt.plot(x, (1-x)**2, label="square")
 plt.plot(x, np.maximum((1-x)**2,0), label="modified LS")
 plt.plot(x, np.maximum((1-x),0), label="SVM")
