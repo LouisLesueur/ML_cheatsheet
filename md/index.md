@@ -500,7 +500,6 @@ Model selection consists in optimizing a model family or canditates (tuning the 
 To perform model selection, the dataset $\mathcal{D}_n$ is splitted in three subsets:
 
 + Training: $\mathcal{D}_{train}$
-+ Validation: $\mathcal{D}_{val}$
 + Test: $\mathcal{D}_{test}$
 
 The model is trained with the train set, so the estimator of $f$ depends of $\mathcal{D}_{train}$ and we note: $\hat{f}(x) = \hat{f}(x, \mathcal{D})$
@@ -534,7 +533,6 @@ $$
 Naturally we define:
 
 + training error: $E_{train} = E_{\mathcal{D}_{train}}$
-+ validation error: $E_{val} = E_{\mathcal{D}_{val}}$
 + test error: $E_{test} = E_{\mathcal{D}_{test}}$
 
 
@@ -590,7 +588,7 @@ Multiple indicators can be used to evaluate regression goodness of fit ($p$ is t
 
 ##### Model evaluation
 
-###### Confusion matrix
+###### Confusion matrix
 
 For classification, we define the confusion matrix (cf figure), where $p_{ij}$ is the proportion of instances estimated to be in class number $i$ by the classifier when they actually belong to class number $j$
 
@@ -616,10 +614,18 @@ To estimate the good of fit of a classifier one can compute the measures:
 |Jaccard coefficient of community | $JJC_i = \frac{p_{TP}}{p_{TP}+p_{FP}+p_{FN}} = \frac{F_i}{2-F_i}$ | can be interpreted as the ratio of the estimated and true classes intersection to their union (in terms of set cardinality). It ranges from 0 (no overlap) to 1 (complete overlap)
 |Classification Success Index| $ICSI_i = PPV_i + TPR_i -1$ |
 
-###### ROC space
+###### ROC space
 
 For a continuous classifier, the selection of the best threshold can be done by plotting its performances in the ROC space (TP in function of FP), and chosing the threshold value which is closer to the ideal point.
 
+
+#### Model validation
+
+To see if a model is robust, using only a training and a test isn't sufficient, especially if there is some hyperparameter tuning step.
+
++ add a validation set (if enough data): the idea is to train the model on the train set, to tune hyperparameters by looking at the validation error (to detect overfitting) and to finally validate the model by looking at its performances on the test set.
+
++ cross validation: the principle of cross validation is to create several bipartitions of the dataset and to train/test it on each of these partitions.
 
 ## Generative models
 
