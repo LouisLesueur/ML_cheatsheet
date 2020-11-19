@@ -732,7 +732,6 @@ f_{NN} = (f_1 \circ f_2 \ldots \circ f_L) \circ (pool_K \circ conv_K \circ \ldot
 <p>Model selection consists in optimizing a model family or canditates (tuning the hyperparameters) To perform model selection, the dataset <span class="math inline">\mathcal{D}_n</span> is splitted in three subsets:</p>
 <ul>
 <li>Training: <span class="math inline">\mathcal{D}_{train}</span></li>
-<li>Validation: <span class="math inline">\mathcal{D}_{val}</span></li>
 <li>Test: <span class="math inline">\mathcal{D}_{test}</span></li>
 </ul>
 <p>The model is trained with the train set, so the estimator of <span class="math inline">f</span> depends of <span class="math inline">\mathcal{D}_{train}</span> and we note: <span class="math inline">\hat{f}(x) = \hat{f}(x, \mathcal{D})</span></p>
@@ -759,7 +758,6 @@ E_{\mathcal{D}} = \frac{1}{|\mathcal{D}|} \sum_{x_i \in \mathcal{D}} L(y_i, \hat
 <p>Naturally we define:</p>
 <ul>
 <li>training error: <span class="math inline">E_{train} = E_{\mathcal{D}_{train}}</span></li>
-<li>validation error: <span class="math inline">E_{val} = E_{\mathcal{D}_{val}}</span></li>
 <li>test error: <span class="math inline">E_{test} = E_{\mathcal{D}_{test}}</span></li>
 </ul>
 <p><strong>Overfitting</strong>: A model with complexity c is called overfitting if, for the test error of this model, the following holds: <span class="math display">
@@ -851,7 +849,7 @@ E_{test}(c) - E_{train}(c) &lt; \delta \text{,  } \delta \in \mathbb{R}^+
 </ul>
 <h4 id="classification">Classification</h4>
 <h5 id="model-evaluation-1">Model evaluation</h5>
-<p>###### Confusion matrix</p>
+<h6 id="confusion-matrix">Confusion matrix</h6>
 <p>For classification, we define the confusion matrix (cf figure), where <span class="math inline">p_{ij}</span> is the proportion of instances estimated to be in class number <span class="math inline">i</span> by the classifier when they actually belong to class number <span class="math inline">j</span></p>
 <p><img src="img/confusion.svg" /></p>
 <p>For a class <span class="math inline">i</span> we define:</p>
@@ -918,8 +916,14 @@ E_{test}(c) - E_{train}(c) &lt; \delta \text{,  } \delta \in \mathbb{R}^+
 </tr>
 </tbody>
 </table>
-<p>###### ROC space</p>
+<h6 id="roc-space">ROC space</h6>
 <p>For a continuous classifier, the selection of the best threshold can be done by plotting its performances in the ROC space (TP in function of FP), and chosing the threshold value which is closer to the ideal point.</p>
+<h4 id="model-validation">Model validation</h4>
+<p>To see if a model is robust, using only a training and a test isn’t sufficient, especially if there is some hyperparameter tuning step.</p>
+<ul>
+<li><p>add a validation set (if enough data): the idea is to train the model on the train set, to tune hyperparameters by looking at the validation error (to detect overfitting) and to finally validate the model by looking at its performances on the test set.</p></li>
+<li><p>cross validation: the principle of cross validation is to create several bipartitions of the dataset and to train/test it on each of these partitions.</p></li>
+</ul>
 <h2 id="generative-models">Generative models</h2>
 <ul>
 <li>naive Bayes classifier</li>
