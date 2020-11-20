@@ -55,27 +55,130 @@
             <div class="container">
          <h1 class="title">Unsupervised learning - synthesis</h1>
                   <div class="row">
-            <div class="col-xl-10"><h2 id="density-estimation">Density estimation</h2>
+            <div class="col-xl-10"><h2 id="definitions">Definitions</h2>
+<p>unlike supervised learning, in unsupervised learning the input data are not labelized. The goal is to fond patterns in them. In other words, the dataset <span class="math inline">\mathcal{D}</span> is a radom sample <span class="math inline">\{X_1, \dots, X_n \}</span> from an unknown random variable <span class="math inline">X</span>, and we want to find patterns in them.</p>
+<h2 id="density-estimation">Density estimation</h2>
+<p>See <a href="https://www.ssc.wisc.edu/~bhansen/718/NonParametrics1.pdf">here</a> for a detailed theory</p>
+<h3 id="kernel-density-estimation">Kernel density estimation</h3>
+<p>In kernel density estimation, we want to find the density function of the data-distribution.</p>
+<p>Naturally, the distribution <span class="math inline">F</span> can be estimated by the EDF: <span class="math inline">\hat{F}(x) = n^{-1}\sum_i \mathbb{1}_{\{X_i \leq x}</span>.</p>
+<p>To have an estimation of <span class="math inline">f</span> which is not a set of mass points, one can consider a discrete derivative of the form: <span class="math inline">\hat{f}(x) = \frac{\hat{F}(x+h)-\hat{F}(x-h)}{2h} = \frac{1}{nh} \sum_i k(\frac{X_i-x}{h})</span> with <span class="math inline">k(u) = \frac{1}{2} \mathbb{1}_{|u| \leq 1}</span>. It is a special case of kernel estimator, which have the general form:</p>
+<p><span class="math display">
+\hat{f}(x) =\frac{1}{nh} \sum_i k(\frac{X_i-x}{h})
+</span></p>
+<p>where <span class="math inline">k</span> is a kernel function (ie <span class="math inline">\int_\mathbb{R}k = 1</span>)</p>
+<h4 id="some-kernel-functions-and-properties">Some kernel functions and properties</h4>
 <ul>
-<li>Kernel density estimation and mean shift</li>
+<li>A non-negative kernel is such as: <span class="math inline">k \geq 0</span> on <span class="math inline">\mathbb{R}</span> (in this case <span class="math inline">k</span> is a probability density)</li>
+<li>The moments of a kernel are: <span class="math inline">\kappa_j(k) = \int_\mathbb{R} u^jk(u)du</span></li>
+<li>A symmetric kernel satisfies <span class="math inline">k(u)=k(-u)</span> for all <span class="math inline">u</span>. In this case, all odd moments are zero.</li>
+<li>The order <span class="math inline">\nu</span> of a kernel is defined as the order of its first non-zero moment.</li>
 </ul>
+<p>Here are some second order kernels:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Kernel</th>
+<th>Equation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Uniform</td>
+<td><span class="math inline">\frac{1}{2} \mathbb{1}_{\{|u| \leq 1 \}}</span></td>
+</tr>
+<tr class="even">
+<td>Epanechnikov</td>
+<td><span class="math inline">\frac{3}{4}(1-u^2) \mathbb{1}_{\{|u| \leq 1 \}}</span></td>
+</tr>
+<tr class="odd">
+<td>Gaussian</td>
+<td><span class="math inline">\frac{1}{\sqrt{2 \pi}} \exp{(-\frac{u^2}{2})}</span></td>
+</tr>
+</tbody>
+</table>
 <h2 id="clustering">Clustering</h2>
+<h3 id="k-means"><span class="math inline">k</span>-means</h3>
+<p>In <span class="math inline">k</span>-means, we want to partition the data in <span class="math inline">k</span> subsets <span class="math inline">S = \{S_1,\dots,S_k\}</span> so as to minimize the within-cluster sum of squares (which is linked to variance). Formally, we want to find:</p>
+<p><span class="math display">
+\arg \min_S \sum_{i=1}^k \sum_{x \in S_i} ||x- \mu_i ||^2 = \arg \min_S \sum_{i=1}^k |S_i| \text{Var} S_i = \arg \min_S \sum_{i=1}^k \frac{1}{2|S_i|} \sum_{x,y \in S_i} ||x - y ||^2
+</span></p>
+<p>To solve the problem, the idea is to chose <span class="math inline">k</span> initial points for cluster centroids, calculate the Voronoi regions associated to them and update them by the formed cluster means.</p>
+<h3 id="hierarchical-clustering">hierarchical clustering</h3>
+<p>In hierarchical clstering, for a given metric and a linkage function (distance between clusters). The clustering consists in building a dendogram following the steps (bottom-up approach is presented here, but one can also imagine top-down methods):</p>
+<ol type="1">
+<li>Put each data in a unique cluster</li>
+<li>Compute the pairwise linkage between each cluster</li>
+<li>Group the two clusters with smallest linkage</li>
+<li>Repeat steps two and three until there is on cluster</li>
+</ol>
+<p>Here are some common linkage functions:</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 75%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Formula (<span class="math inline">A</span> and <span class="math inline">B</span> are two sets of observation)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Maximum</td>
+<td><span class="math inline">d(A,B) = \max(d(a,b) | a \in A, b \in B)</span></td>
+</tr>
+<tr class="even">
+<td>Minimum</td>
+<td><span class="math inline">d(A,B) = \min(d(a,b) | a \in A, b \in B)</span></td>
+</tr>
+<tr class="odd">
+<td>UPGMA</td>
+<td><span class="math inline">d(A,B) = \frac{1}{|A| |B|} \sum_{a \in A} \sum_{b \in B} d(a,b)</span></td>
+</tr>
+<tr class="even">
+<td>WPGMA</td>
+<td><span class="math inline">d(A \cup B, C) = \frac{d(A,C) + d(B,C)}{2}</span></td>
+</tr>
+<tr class="odd">
+<td>UPGMC</td>
+<td><span class="math inline">d(1,B) = ||\mu_A - \mu_B||</span> where <span class="math inline">\mu_A</span> and <span class="math inline">\mu_B</span> are the centroids of the clusters</td>
+</tr>
+<tr class="even">
+<td>Energy distance</td>
+<td><span class="math inline">d(A,B) = \frac{2}{nm} \sum_{i,j} ||a_i - b_j||_2 - \frac{1}{n^2} \sum_{i,j} ||a_i - a_j||_2 - \frac{1}{m^2} \sum_{i,j} ||b_i - a_j||_2</span></td>
+</tr>
+<tr class="odd">
+<td>Ward distance</td>
+<td><span class="math inline">d(A,B) = \frac{nm}{n+m}d(\mu_A, \mu_B)</span></td>
+</tr>
+</tbody>
+</table>
+<h3 id="density-based-methods-dbscan-and-optics">Density based methods: DBSCAN and OPTICS</h3>
+<p>DBSCAN use the notion of neighbourhood to perform clustering. There are two parameters:</p>
 <ul>
-<li>hierarchical clustering</li>
-<li>k-means</li>
-<li>mixture models</li>
-<li>DBSCAN</li>
-<li>OPTICS algorithm</li>
+<li><span class="math inline">\epsilon</span>, the radius of the neighborhood</li>
+<li><span class="math inline">m</span> the minimum number of points in an <span class="math inline">\epsilon</span>-neighborhood</li>
+</ul>
+<p>For <span class="math inline">p \in \mathcal{D}</span>, let consider <span class="math inline">N_\epsilon(p) = \{ q \in \mathcal{D} | d(p,q) &lt; \epsilon \}</span>. We say that:</p>
+<ul>
+<li><span class="math inline">q</span> is directly density-reachable from <span class="math inline">p</span> if <span class="math inline">q \in N_\epsilon(p)</span> and <span class="math inline">|N_\epsilon(p)| \geq m</span>.</li>
+<li><span class="math inline">q</span> is density-reachable from <span class="math inline">p</span> if there exist a sequence of two by two directly density-reachable points between them.</li>
+<li><span class="math inline">q</span> is density-connected to <span class="math inline">p</span> if there exist <span class="math inline">o \in \mathcal{D}</span> such as both <span class="math inline">p</span> and <span class="math inline">q</span> are density-reachable from <span class="math inline">o</span></li>
+</ul>
+<p>Then, clusters are build by grouping points according to density-connectivity. And for a given cluster, we can distinguish core points (with dense neighborhood) from border points (which are in a cluster but with not dense neighborhood), and from noise (which are neither core neither border).</p>
+<p>OPTICS algorithm is another density-based clustering methods, using the same idea.</p>
+<h3 id="expectationmaximization-em">Expectation–maximization (EM)</h3>
+<h2 id="dimenstion-reduction">Dimenstion reduction</h2>
+<ul>
+<li>Principal component analysis</li>
+<li>Independent component analysis</li>
 </ul>
 <h2 id="anomaly-detection">Anomaly detection</h2>
 <ul>
 <li>Local Outlier Factor</li>
 <li>Isolation Forest</li>
-</ul>
-<h2 id="dimenstion-reduction">Dimenstion reduction</h2>
-<ul>
-<li>Principal component analysis</li>
-<li>Independent component analysis</li>
 </ul>
 <h2 id="neural-networks">Neural Networks</h2>
 <ul>
@@ -88,10 +191,20 @@
             <div class="d-none d-xl-block col-xl-2 bd-toc">
                <ul class="section-nav">
                   <li class="toc-entry"><ul>
-<li><a href="#density-estimation">Density estimation</a></li>
-<li><a href="#clustering">Clustering</a></li>
-<li><a href="#anomaly-detection">Anomaly detection</a></li>
+<li><a href="#definitions">Definitions</a></li>
+<li><a href="#density-estimation">Density estimation</a>
+<ul>
+<li><a href="#kernel-density-estimation">Kernel density estimation</a></li>
+</ul></li>
+<li><a href="#clustering">Clustering</a>
+<ul>
+<li><a href="#k-means"><span class="math inline">k</span>-means</a></li>
+<li><a href="#hierarchical-clustering">hierarchical clustering</a></li>
+<li><a href="#density-based-methods-dbscan-and-optics">Density based methods: DBSCAN and OPTICS</a></li>
+<li><a href="#expectationmaximization-em">Expectation–maximization (EM)</a></li>
+</ul></li>
 <li><a href="#dimenstion-reduction">Dimenstion reduction</a></li>
+<li><a href="#anomaly-detection">Anomaly detection</a></li>
 <li><a href="#neural-networks">Neural Networks</a></li>
 </ul></li>
                </ul>

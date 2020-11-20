@@ -2,24 +2,104 @@
 title: Unsupervised learning - synthesis
 author: Louis Lesueur
 ---
-## Density estimation
-+ Kernel density estimation and mean shift
 
+## Definitions
+
+unlike supervised learning, in unsupervised learning the input data are not labelized. The goal is to fond patterns in them. In other words, the dataset $\mathcal{D}$ is a radom sample $\{X_1, \dots, X_n \}$ from an unknown random variable $X$, and we want to find patterns in them.
+
+
+## Density estimation
+
+See [here](https://www.ssc.wisc.edu/~bhansen/718/NonParametrics1.pdf) for a detailed theory
+
+### Kernel density estimation
+
+In kernel density estimation, we want to find the density function of the data-distribution.
+
+Naturally, the distribution $F$ can be estimated by the EDF: $\hat{F}(x) = n^{-1}\sum_i \mathbb{1}_{\{X_i \leq x}$.
+
+To have an estimation of $f$ which is not a set of mass points, one can consider a discrete derivative of the form: $\hat{f}(x) = \frac{\hat{F}(x+h)-\hat{F}(x-h)}{2h} = \frac{1}{nh} \sum_i k(\frac{X_i-x}{h})$ with $k(u) = \frac{1}{2} \mathbb{1}_{|u| \leq 1}$. It is a special case of kernel estimator, which have the general form:
+
+$$
+\hat{f}(x) =\frac{1}{nh} \sum_i k(\frac{X_i-x}{h})
+$$
+
+where $k$ is a kernel function (ie $\int_\mathbb{R}k = 1$)
+
+#### Some kernel functions and properties
+
++ A non-negative kernel is such as: $k \geq 0$ on $\mathbb{R}$ (in this case $k$ is a probability density)
++ The moments of a kernel are: $\kappa_j(k) = \int_\mathbb{R} u^jk(u)du$
++ A symmetric kernel satisfies $k(u)=k(-u)$ for all $u$. In this case, all odd moments are zero.
++ The order $\nu$ of a kernel is defined as the order of its first non-zero moment.
+
+Here are some second order kernels:
+
+| Kernel | Equation |
+|-|-|
+Uniform | $\frac{1}{2} \mathbb{1}_{\{|u| \leq 1 \}}$
+Epanechnikov | $\frac{3}{4}(1-u^2) \mathbb{1}_{\{|u| \leq 1 \}}$
+Gaussian | $\frac{1}{\sqrt{2 \pi}} \exp{(-\frac{u^2}{2})}$
 
 ## Clustering
-+ hierarchical clustering
-+ k-means
-+ mixture models
-+ DBSCAN
-+ OPTICS algorithm
 
-## Anomaly detection
-+ Local Outlier Factor
-+ Isolation Forest
+### $k$-means
+
+In $k$-means, we want to partition the data in $k$ subsets $S = \{S_1,\dots,S_k\}$ so as to minimize the within-cluster sum of squares (which is linked to variance). Formally, we want to find:
+
+$$
+\arg \min_S \sum_{i=1}^k \sum_{x \in S_i} ||x- \mu_i ||^2 = \arg \min_S \sum_{i=1}^k |S_i| \text{Var} S_i = \arg \min_S \sum_{i=1}^k \frac{1}{2|S_i|} \sum_{x,y \in S_i} ||x - y ||^2
+$$
+
+To solve the problem, the idea is to chose $k$ initial points for cluster centroids, calculate the Voronoi regions associated to them and update them by the formed cluster means.
+
+### hierarchical clustering
+
+In hierarchical clstering, for a given metric and a linkage function (distance between clusters). The clustering consists in building a dendogram following the steps (bottom-up approach is presented here, but one can also imagine top-down methods):
+
+1. Put each data in a unique cluster
+2. Compute the pairwise linkage between each cluster
+3. Group the two clusters with smallest linkage
+4. Repeat steps two and three until there is on cluster
+
+Here are some common linkage functions:
+
+| Name | Formula ($A$ and $B$ are two sets of observation)
+|-|---
+|Maximum | $d(A,B) = \max(d(a,b) | a \in A, b \in B)$
+|Minimum | $d(A,B) = \min(d(a,b) | a \in A, b \in B)$
+|UPGMA   | $d(A,B) = \frac{1}{|A| |B|} \sum_{a \in A} \sum_{b \in B} d(a,b)$
+|WPGMA   | $d(A \cup B, C) = \frac{d(A,C) + d(B,C)}{2}$
+|UPGMC   | $d(1,B) = ||\mu_A - \mu_B||$ where $\mu_A$ and $\mu_B$ are the centroids of the clusters
+|Energy distance | $d(A,B) = \frac{2}{nm} \sum_{i,j} ||a_i - b_j||_2 - \frac{1}{n^2} \sum_{i,j} ||a_i - a_j||_2 - \frac{1}{m^2} \sum_{i,j} ||b_i - a_j||_2$
+|Ward distance | $d(A,B) = \frac{nm}{n+m}d(\mu_A, \mu_B)$
+### Density based methods: DBSCAN and OPTICS
+
+DBSCAN use the notion of neighbourhood to perform clustering. There are two parameters:
+
++ $\epsilon$, the radius of the neighborhood
++ $m$ the minimum number of points in an $\epsilon$-neighborhood
+
+For $p \in \mathcal{D}$, let consider $N_\epsilon(p) = \{ q \in \mathcal{D} | d(p,q) < \epsilon \}$. We say that:
+
++ $q$ is directly density-reachable from $p$ if $q \in N_\epsilon(p)$ and $|N_\epsilon(p)| \geq m$.
++ $q$ is density-reachable from $p$ if there exist a sequence of two by two directly density-reachable points between them.
++ $q$ is density-connected to $p$ if there exist $o \in \mathcal{D}$ such as both $p$ and $q$ are density-reachable from $o$
+
+Then, clusters are build by grouping points according to density-connectivity. And for a given cluster, we can distinguish core points (with dense neighborhood) from border points (which are in a cluster but with not dense neighborhood), and from noise (which are neither core neither border).
+
+OPTICS algorithm is another density-based clustering methods, using the same idea.
+
+
+### Expectation–maximization (EM)
 
 ## Dimenstion reduction
 + Principal component analysis
 + Independent component analysis
+
+## Anomaly detection
++ Local Outlier Factor
++ Isolation Forest
 
 ## Neural Networks
 + Autoencoders

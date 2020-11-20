@@ -11,3 +11,5 @@ A synthetic cheatsheet for Machine Learning, accessible [here](https://louislesu
 + [ ] orthograph/syntax/consistency
 + [ ] add sources
 + [ ] write missing parts
+
+City,Province,Region,Details,Current Location,Object,Material,Re-Use,Clothing,Hairstyle,Height(cm),Honorand,Position,Gender,Awarder,Awarder position,Earliest,Latest,"Main Reference"
