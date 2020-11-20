@@ -7,39 +7,57 @@ author: Louis Lesueur
 
 unlike supervised learning, in unsupervised learning the input data are not labelized. The goal is to fond patterns in them. In other words, the dataset $\mathcal{D}$ is a radom sample $\{X_1, \dots, X_n \}$ from an unknown random variable $X$, and we want to find patterns in them.
 
+## Dimension reduction
 
-## Density estimation
+### Principal component analysis
 
-See [here](https://www.ssc.wisc.edu/~bhansen/718/NonParametrics1.pdf) for a detailed theory
+#### Some reminders
 
-### Kernel density estimation
++ Correlation matrix of the dataset: $K_n = \frac{1}{n} \sum_i (x_i- \bar{x_n})^T (x_i-\bar{x_n}) = \frac{1}{n} \sum_i x_i^Tx_i - \bar{x_n}^T \bar{x_n}$
++ Empirical variance: $\sigma_n^2 = \frac{1}{n} \sum_i ||x_i - \bar{x_n}||^2 = tr(K_n)$
++ Empirical correlation between features: $Corr(x^j, x^{j'}) = \frac{K_n^{jj'}}{\sqrt{K_n^{jj}} \sqrt{K_n^{j'j'}}} = \frac{K_n^{jj'}}{\sigma_n^j \sigma_n^{j'}}$
 
-In kernel density estimation, we want to find the density function of the data-distribution.
+#### PCA principle
 
-Naturally, the distribution $F$ can be estimated by the EDF: $\hat{F}(x) = n^{-1}\sum_i \mathbb{1}_{\{X_i \leq x}$.
+To apply PCA, we suppose that data is centered (ie $\bar{x_n}=0$). If the features are too different, the dataset could benefit from standardization.
 
-To have an estimation of $f$ which is not a set of mass points, one can consider a discrete derivative of the form: $\hat{f}(x) = \frac{\hat{F}(x+h)-\hat{F}(x-h)}{2h} = \frac{1}{nh} \sum_i k(\frac{X_i-x}{h})$ with $k(u) = \frac{1}{2} \mathbb{1}_{|u| \leq 1}$. It is a special case of kernel estimator, which have the general form:
+Suppose that they are $p$ features (ie a data vector is in $\mathbb{R^p}$), the goal of PCA is to find an orthogonal projection on a subspace with dimension $k<p$ that best preserve the original shape of the set, that 'lose less information possible'.
+
+As the data are centered, and using Pythagoras's theorem, orthogonal projection on $H$ gives:
+$$
+\sigma_n^2 = (\sigma_n^H)^2 + \frac{1}{n} \sum_i ||x_i - x_i^H||^2
+$$
+
+We want to maximize $(\sigma_n^H)^2$, to preserve the maximum of information. But, for $H_k = Span(e_1, \dot, e_k)$ we have:
+$$
+(\sigma_n^{H_k})^2 = \sum_{j=1}^k \lambda_j
+$$
+where the $\lambda_j$ are the eigenvalues of $K_n$.
+
+And, for all linear spaces $H$ with dimension $k$, we have: $(\sigma_n^H)^2 \leq (\sigma_n^{H_k})^2$. Hence, **the computation of optimal subspaces is reduced to the diagonalisation of the empirical covariance matrix**.
+
+#### Interpretation of PCA
+
+The $l$-th principal component is the column vector $c^l = \sum_{j=1}^p e_l^j x^j$
+
+The principal components are uncorrelated: $Corr(c^l, c^{l'}) = 0$ if $l \neq l'$, furthermore: $\forall l \in \{1, \dots, p \}, Corr(c^l, x^j) = \frac{\sqrt{\lambda_l}e_l^j}{\sigma_n^j}$ and:
+$$
+\sum_{l=1}^p Corr(c^l, x^j)^2 = 1
+$$
+
+The last equation implies that the point of $\mathbb{R}^p$ with coordinates $(Corr(c^1,x^j), \dots, Corr(c^p,x^j))$ are on the unit sphere of $\mathbb{R}^p$. It is called the correlation sphere. The plane spanned by $(c^1, c^2)$ is called the first factorial plane. When a feature is closed to the center of a factorial plan, it means that the selected principal component aren't enough to explain its variance in the dataset.
+
+#### Proportion of variance explained by PCA:
+
+The propotion of variance explained by PCA is the ratio:
 
 $$
-\hat{f}(x) =\frac{1}{nh} \sum_i k(\frac{X_i-x}{h})
+\frac{(\sigma_n^{H_k})^2}{\sigma_n^2} = \frac{\sum_{j=1}^k \lambda_j}{\sum_{j=1}^p \lambda_j}
 $$
 
-where $k$ is a kernel function (ie $\int_\mathbb{R}k = 1$)
+It is usefull to control how much information is lost by performing dimension reduction with PCA.
 
-#### Some kernel functions and properties
-
-+ A non-negative kernel is such as: $k \geq 0$ on $\mathbb{R}$ (in this case $k$ is a probability density)
-+ The moments of a kernel are: $\kappa_j(k) = \int_\mathbb{R} u^jk(u)du$
-+ A symmetric kernel satisfies $k(u)=k(-u)$ for all $u$. In this case, all odd moments are zero.
-+ The order $\nu$ of a kernel is defined as the order of its first non-zero moment.
-
-Here are some second order kernels:
-
-| Kernel | Equation |
-|-|-|
-Uniform | $\frac{1}{2} \mathbb{1}_{\{|u| \leq 1 \}}$
-Epanechnikov | $\frac{3}{4}(1-u^2) \mathbb{1}_{\{|u| \leq 1 \}}$
-Gaussian | $\frac{1}{\sqrt{2 \pi}} \exp{(-\frac{u^2}{2})}$
+### Independent component analysis
 
 ## Clustering
 
@@ -73,6 +91,7 @@ Here are some common linkage functions:
 |UPGMC   | $d(1,B) = ||\mu_A - \mu_B||$ where $\mu_A$ and $\mu_B$ are the centroids of the clusters
 |Energy distance | $d(A,B) = \frac{2}{nm} \sum_{i,j} ||a_i - b_j||_2 - \frac{1}{n^2} \sum_{i,j} ||a_i - a_j||_2 - \frac{1}{m^2} \sum_{i,j} ||b_i - a_j||_2$
 |Ward distance | $d(A,B) = \frac{nm}{n+m}d(\mu_A, \mu_B)$
+
 ### Density based methods: DBSCAN and OPTICS
 
 DBSCAN use the notion of neighbourhood to perform clustering. There are two parameters:
@@ -93,9 +112,38 @@ OPTICS algorithm is another density-based clustering methods, using the same ide
 
 ### Expectation–maximization (EM)
 
-## Dimenstion reduction
-+ Principal component analysis
-+ Independent component analysis
+## Density estimation
+
+See [here](https://www.ssc.wisc.edu/~bhansen/718/NonParametrics1.pdf) for a detailed theory
+
+### Kernel density estimation
+
+In kernel density estimation, we want to find the density function of the data-distribution.
+
+Naturally, the distribution $F$ can be estimated by the EDF: $\hat{F}(x) = n^{-1}\sum_i \mathbb{1}_{\{X_i \leq x}$.
+
+To have an estimation of $f$ which is not a set of mass points, one can consider a discrete derivative of the form: $\hat{f}(x) = \frac{\hat{F}(x+h)-\hat{F}(x-h)}{2h} = \frac{1}{nh} \sum_i k(\frac{X_i-x}{h})$ with $k(u) = \frac{1}{2} \mathbb{1}_{|u| \leq 1}$. It is a special case of kernel estimator, which have the general form:
+
+$$
+\hat{f}(x) =\frac{1}{nh} \sum_i k(\frac{X_i-x}{h})
+$$
+
+where $k$ is a kernel function (ie $\int_\mathbb{R}k = 1$)
+
+#### Some kernel functions and properties
+
++ A non-negative kernel is such as: $k \geq 0$ on $\mathbb{R}$ (in this case $k$ is a probability density)
++ The moments of a kernel are: $\kappa_j(k) = \int_\mathbb{R} u^jk(u)du$
++ A symmetric kernel satisfies $k(u)=k(-u)$ for all $u$. In this case, all odd moments are zero.
++ The order $\nu$ of a kernel is defined as the order of its first non-zero moment.
+
+Here are some second order kernels:
+
+| Kernel | Equation |
+|-|-|
+Uniform | $\frac{1}{2} \mathbb{1}_{\{|u| \leq 1 \}}$
+Epanechnikov | $\frac{3}{4}(1-u^2) \mathbb{1}_{\{|u| \leq 1 \}}$
+Gaussian | $\frac{1}{\sqrt{2 \pi}} \exp{(-\frac{u^2}{2})}$
 
 ## Anomaly detection
 + Local Outlier Factor

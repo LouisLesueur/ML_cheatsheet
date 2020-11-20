@@ -57,46 +57,37 @@
                   <div class="row">
             <div class="col-xl-10"><h2 id="definitions">Definitions</h2>
 <p>unlike supervised learning, in unsupervised learning the input data are not labelized. The goal is to fond patterns in them. In other words, the dataset <span class="math inline">\mathcal{D}</span> is a radom sample <span class="math inline">\{X_1, \dots, X_n \}</span> from an unknown random variable <span class="math inline">X</span>, and we want to find patterns in them.</p>
-<h2 id="density-estimation">Density estimation</h2>
-<p>See <a href="https://www.ssc.wisc.edu/~bhansen/718/NonParametrics1.pdf">here</a> for a detailed theory</p>
-<h3 id="kernel-density-estimation">Kernel density estimation</h3>
-<p>In kernel density estimation, we want to find the density function of the data-distribution.</p>
-<p>Naturally, the distribution <span class="math inline">F</span> can be estimated by the EDF: <span class="math inline">\hat{F}(x) = n^{-1}\sum_i \mathbb{1}_{\{X_i \leq x}</span>.</p>
-<p>To have an estimation of <span class="math inline">f</span> which is not a set of mass points, one can consider a discrete derivative of the form: <span class="math inline">\hat{f}(x) = \frac{\hat{F}(x+h)-\hat{F}(x-h)}{2h} = \frac{1}{nh} \sum_i k(\frac{X_i-x}{h})</span> with <span class="math inline">k(u) = \frac{1}{2} \mathbb{1}_{|u| \leq 1}</span>. It is a special case of kernel estimator, which have the general form:</p>
-<p><span class="math display">
-\hat{f}(x) =\frac{1}{nh} \sum_i k(\frac{X_i-x}{h})
-</span></p>
-<p>where <span class="math inline">k</span> is a kernel function (ie <span class="math inline">\int_\mathbb{R}k = 1</span>)</p>
-<h4 id="some-kernel-functions-and-properties">Some kernel functions and properties</h4>
+<h2 id="dimension-reduction">Dimension reduction</h2>
+<h3 id="principal-component-analysis">Principal component analysis</h3>
+<h4 id="some-reminders">Some reminders</h4>
 <ul>
-<li>A non-negative kernel is such as: <span class="math inline">k \geq 0</span> on <span class="math inline">\mathbb{R}</span> (in this case <span class="math inline">k</span> is a probability density)</li>
-<li>The moments of a kernel are: <span class="math inline">\kappa_j(k) = \int_\mathbb{R} u^jk(u)du</span></li>
-<li>A symmetric kernel satisfies <span class="math inline">k(u)=k(-u)</span> for all <span class="math inline">u</span>. In this case, all odd moments are zero.</li>
-<li>The order <span class="math inline">\nu</span> of a kernel is defined as the order of its first non-zero moment.</li>
+<li>Correlation matrix of the dataset: <span class="math inline">K_n = \frac{1}{n} \sum_i (x_i- \bar{x_n})^T (x_i-\bar{x_n}) = \frac{1}{n} \sum_i x_i^Tx_i - \bar{x_n}^T \bar{x_n}</span></li>
+<li>Empirical variance: <span class="math inline">\sigma_n^2 = \frac{1}{n} \sum_i ||x_i - \bar{x_n}||^2 = tr(K_n)</span></li>
+<li>Empirical correlation between features: <span class="math inline">Corr(x^j, x^{j&#39;}) = \frac{K_n^{jj&#39;}}{\sqrt{K_n^{jj}} \sqrt{K_n^{j&#39;j&#39;}}} = \frac{K_n^{jj&#39;}}{\sigma_n^j \sigma_n^{j&#39;}}</span></li>
 </ul>
-<p>Here are some second order kernels:</p>
-<table>
-<thead>
-<tr class="header">
-<th>Kernel</th>
-<th>Equation</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Uniform</td>
-<td><span class="math inline">\frac{1}{2} \mathbb{1}_{\{|u| \leq 1 \}}</span></td>
-</tr>
-<tr class="even">
-<td>Epanechnikov</td>
-<td><span class="math inline">\frac{3}{4}(1-u^2) \mathbb{1}_{\{|u| \leq 1 \}}</span></td>
-</tr>
-<tr class="odd">
-<td>Gaussian</td>
-<td><span class="math inline">\frac{1}{\sqrt{2 \pi}} \exp{(-\frac{u^2}{2})}</span></td>
-</tr>
-</tbody>
-</table>
+<h4 id="pca-principle">PCA principle</h4>
+<p>To apply PCA, we suppose that data is centered (ie <span class="math inline">\bar{x_n}=0</span>). If the features are too different, the dataset could benefit from standardization.</p>
+<p>Suppose that they are <span class="math inline">p</span> features (ie a data vector is in <span class="math inline">\mathbb{R^p}</span>), the goal of PCA is to find an orthogonal projection on a subspace with dimension <span class="math inline">k&lt;p</span> that best preserve the original shape of the set, that ‘lose less information possible’.</p>
+<p>As the data are centered, and using Pythagoras’s theorem, orthogonal projection on <span class="math inline">H</span> gives: <span class="math display">
+\sigma_n^2 = (\sigma_n^H)^2 + \frac{1}{n} \sum_i ||x_i - x_i^H||^2
+</span></p>
+<p>We want to maximize <span class="math inline">(\sigma_n^H)^2</span>, to preserve the maximum of information. But, for <span class="math inline">H_k = Span(e_1, \dot, e_k)</span> we have: <span class="math display">
+(\sigma_n^{H_k})^2 = \sum_{j=1}^k \lambda_j
+</span> where the <span class="math inline">\lambda_j</span> are the eigenvalues of <span class="math inline">K_n</span>.</p>
+<p>And, for all linear spaces <span class="math inline">H</span> with dimension <span class="math inline">k</span>, we have: <span class="math inline">(\sigma_n^H)^2 \leq (\sigma_n^{H_k})^2</span>. Hence, <strong>the computation of optimal subspaces is reduced to the diagonalisation of the empirical covariance matrix</strong>.</p>
+<h4 id="interpretation-of-pca">Interpretation of PCA</h4>
+<p>The <span class="math inline">l</span>-th principal component is the column vector <span class="math inline">c^l = \sum_{j=1}^p e_l^j x^j</span></p>
+<p>The principal components are uncorrelated: <span class="math inline">Corr(c^l, c^{l&#39;}) = 0</span> if <span class="math inline">l \neq l&#39;</span>, furthermore: <span class="math inline">\forall l \in \{1, \dots, p \}, Corr(c^l, x^j) = \frac{\sqrt{\lambda_l}e_l^j}{\sigma_n^j}</span> and: <span class="math display">
+\sum_{l=1}^p Corr(c^l, x^j)^2 = 1
+</span></p>
+<p>The last equation implies that the point of <span class="math inline">\mathbb{R}^p</span> with coordinates <span class="math inline">(Corr(c^1,x^j), \dots, Corr(c^p,x^j))</span> are on the unit sphere of <span class="math inline">\mathbb{R}^p</span>. It is called the correlation sphere. The plane spanned by <span class="math inline">(c^1, c^2)</span> is called the first factorial plane. When a feature is closed to the center of a factorial plan, it means that the selected principal component aren’t enough to explain its variance in the dataset.</p>
+<h4 id="proportion-of-variance-explained-by-pca">Proportion of variance explained by PCA:</h4>
+<p>The propotion of variance explained by PCA is the ratio:</p>
+<p><span class="math display">
+\frac{(\sigma_n^{H_k})^2}{\sigma_n^2} = \frac{\sum_{j=1}^k \lambda_j}{\sum_{j=1}^p \lambda_j}
+</span></p>
+<p>It is usefull to control how much information is lost by performing dimension reduction with PCA.</p>
+<h3 id="independent-component-analysis">Independent component analysis</h3>
 <h2 id="clustering">Clustering</h2>
 <h3 id="k-means"><span class="math inline">k</span>-means</h3>
 <p>In <span class="math inline">k</span>-means, we want to partition the data in <span class="math inline">k</span> subsets <span class="math inline">S = \{S_1,\dots,S_k\}</span> so as to minimize the within-cluster sum of squares (which is linked to variance). Formally, we want to find:</p>
@@ -170,11 +161,46 @@
 <p>Then, clusters are build by grouping points according to density-connectivity. And for a given cluster, we can distinguish core points (with dense neighborhood) from border points (which are in a cluster but with not dense neighborhood), and from noise (which are neither core neither border).</p>
 <p>OPTICS algorithm is another density-based clustering methods, using the same idea.</p>
 <h3 id="expectationmaximization-em">Expectation–maximization (EM)</h3>
-<h2 id="dimenstion-reduction">Dimenstion reduction</h2>
+<h2 id="density-estimation">Density estimation</h2>
+<p>See <a href="https://www.ssc.wisc.edu/~bhansen/718/NonParametrics1.pdf">here</a> for a detailed theory</p>
+<h3 id="kernel-density-estimation">Kernel density estimation</h3>
+<p>In kernel density estimation, we want to find the density function of the data-distribution.</p>
+<p>Naturally, the distribution <span class="math inline">F</span> can be estimated by the EDF: <span class="math inline">\hat{F}(x) = n^{-1}\sum_i \mathbb{1}_{\{X_i \leq x}</span>.</p>
+<p>To have an estimation of <span class="math inline">f</span> which is not a set of mass points, one can consider a discrete derivative of the form: <span class="math inline">\hat{f}(x) = \frac{\hat{F}(x+h)-\hat{F}(x-h)}{2h} = \frac{1}{nh} \sum_i k(\frac{X_i-x}{h})</span> with <span class="math inline">k(u) = \frac{1}{2} \mathbb{1}_{|u| \leq 1}</span>. It is a special case of kernel estimator, which have the general form:</p>
+<p><span class="math display">
+\hat{f}(x) =\frac{1}{nh} \sum_i k(\frac{X_i-x}{h})
+</span></p>
+<p>where <span class="math inline">k</span> is a kernel function (ie <span class="math inline">\int_\mathbb{R}k = 1</span>)</p>
+<h4 id="some-kernel-functions-and-properties">Some kernel functions and properties</h4>
 <ul>
-<li>Principal component analysis</li>
-<li>Independent component analysis</li>
+<li>A non-negative kernel is such as: <span class="math inline">k \geq 0</span> on <span class="math inline">\mathbb{R}</span> (in this case <span class="math inline">k</span> is a probability density)</li>
+<li>The moments of a kernel are: <span class="math inline">\kappa_j(k) = \int_\mathbb{R} u^jk(u)du</span></li>
+<li>A symmetric kernel satisfies <span class="math inline">k(u)=k(-u)</span> for all <span class="math inline">u</span>. In this case, all odd moments are zero.</li>
+<li>The order <span class="math inline">\nu</span> of a kernel is defined as the order of its first non-zero moment.</li>
 </ul>
+<p>Here are some second order kernels:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Kernel</th>
+<th>Equation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Uniform</td>
+<td><span class="math inline">\frac{1}{2} \mathbb{1}_{\{|u| \leq 1 \}}</span></td>
+</tr>
+<tr class="even">
+<td>Epanechnikov</td>
+<td><span class="math inline">\frac{3}{4}(1-u^2) \mathbb{1}_{\{|u| \leq 1 \}}</span></td>
+</tr>
+<tr class="odd">
+<td>Gaussian</td>
+<td><span class="math inline">\frac{1}{\sqrt{2 \pi}} \exp{(-\frac{u^2}{2})}</span></td>
+</tr>
+</tbody>
+</table>
 <h2 id="anomaly-detection">Anomaly detection</h2>
 <ul>
 <li>Local Outlier Factor</li>
@@ -192,9 +218,10 @@
                <ul class="section-nav">
                   <li class="toc-entry"><ul>
 <li><a href="#definitions">Definitions</a></li>
-<li><a href="#density-estimation">Density estimation</a>
+<li><a href="#dimension-reduction">Dimension reduction</a>
 <ul>
-<li><a href="#kernel-density-estimation">Kernel density estimation</a></li>
+<li><a href="#principal-component-analysis">Principal component analysis</a></li>
+<li><a href="#independent-component-analysis">Independent component analysis</a></li>
 </ul></li>
 <li><a href="#clustering">Clustering</a>
 <ul>
@@ -203,7 +230,10 @@
 <li><a href="#density-based-methods-dbscan-and-optics">Density based methods: DBSCAN and OPTICS</a></li>
 <li><a href="#expectationmaximization-em">Expectation–maximization (EM)</a></li>
 </ul></li>
-<li><a href="#dimenstion-reduction">Dimenstion reduction</a></li>
+<li><a href="#density-estimation">Density estimation</a>
+<ul>
+<li><a href="#kernel-density-estimation">Kernel density estimation</a></li>
+</ul></li>
 <li><a href="#anomaly-detection">Anomaly detection</a></li>
 <li><a href="#neural-networks">Neural Networks</a></li>
 </ul></li>
