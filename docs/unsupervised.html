@@ -207,13 +207,71 @@
 <li>Isolation Forest</li>
 </ul>
 <h2 id="neural-networks">Neural Networks</h2>
+<h3 id="autoencoders">Autoencoders</h3>
+<p>An autoencoder is a NN that is tarined to attempts to copy its input to its output. It is composed of two parts:</p>
 <ul>
-<li>Autoencoders</li>
-<li>Deep Belief Nets</li>
-<li>Hebbian Learning</li>
-<li>Generative adversarial networks</li>
-<li>Self-organizing map</li>
-</ul></div>
+<li>The encoding function: <span class="math inline">f: \mathcal{X} \rightarrow \mathcal{F}</span></li>
+<li>The decoding function: <span class="math inline">g: \mathcal{F} \rightarrow \mathcal{X}</span></li>
+</ul>
+<p>where <span class="math inline">\mathcal{F}</span> is the code space.</p>
+<p>In fact, an autoencoder is learning the conditionnal distribution <span class="math inline">p_{AE}(h|x)</span> where <span class="math inline">h \in \mathcal{F}</span>. And we have: <span class="math inline">p_{encoder}(h|x) = p_{AE}(h|x)</span> and <span class="math inline">p_{decoder}(x|h) = p_{AE}(x|h)</span>. And the loss can be seen as a maximum-likelihood maximization, just like in supervized methods.</p>
+<h4 id="vanilla-autoencoders">Vanilla autoencoders</h4>
+<ul>
+<li>Undercomplete autoencoder: code space dimension less than the input space.</li>
+<li>Overcomplete autoencoder : code space dimension greater than the input space.</li>
+</ul>
+<p>The learning consists in minimizing a loss function: <span class="math display">
+L(x,g(f(x))) = ||x-g(f(x))||^2
+</span></p>
+<p>If <span class="math inline">g</span> and <span class="math inline">f</span> are linear, the undercomplete autoencoder is simply learning PCA subspaces ! So non-linear autoencoder can be seen as a non linear generalization of PCA.</p>
+<h4 id="regularized-autoencoders">Regularized autoencoders</h4>
+<p>If the encoder and the decoder have too much capacity, it is possible that they don’t learn anything on the data distribution, but only specific things on the dataset (it is a kind of overfitting). For example, one can imagine an autoencoder which maps <span class="math inline">x_i</span> to <span class="math inline">i</span> and <span class="math inline">i</span> to <span class="math inline">x_i</span>. The learned subset of indexes tells nothing about the data distribution. That’s where regularization join the game.</p>
+<h5 id="sparse-autoencoders-sae">Sparse Autoencoders (SAE)</h5>
+<p>A sparse autoencoder involves a saprsity penalty <span class="math inline">\Omega(h)</span> on the code layer <span class="math inline">f(x)=h</span>: <span class="math display">
+L(x,g(f(x))) + \Omega(h)
+</span></p>
+<p>They are typically used to learn features for other tasks such as classification.</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 37%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Regularization therm</th>
+<th><span class="math inline">\Omega(h)</span></th>
+<th>Remarks</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>KL</td>
+<td><span class="math inline">\sum_j KL(\rho || \frac{1}{n} \sum_i(h_j(x_i)))</span></td>
+<td><span class="math inline">\rho</span> is the sparcity parameter, close to zero. This regularization penalizes average activation of the neurones from <span class="math inline">h</span> on the dataset for deviating from <span class="math inline">\rho</span>, and so force them to be inactive most of the time.</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">L^1</span> and <span class="math inline">L^2</span></td>
+<td><span class="math inline">\lambda ||h||</span></td>
+<td>It is known that these regularizations acheive sparcity.</td>
+</tr>
+</tbody>
+</table>
+<h5 id="contractive-autoencoders-cae">Contractive Autoencoders (CAE)</h5>
+<p>Another regularization strategy consists in penalizing the gradient: <span class="math display">
+L(x,g(f(x))) + \lambda \sum_i || \nabla_x h_i ||^2
+</span></p>
+<p>This forces the model to learn a function that does not changes much when <span class="math inline">x</span> changes slightly.</p>
+<h4 id="denoising-autoencoders-dae">Denoising Autoencoders (DAE)</h4>
+<p>A denoising autoencoder minimizes: <span class="math display">
+L(x,g(f(\tilde{x})))
+</span></p>
+<p>where <span class="math inline">\tilde{x}</span> is a copy of <span class="math inline">x</span> that has been corrupted by some noise.</p>
+<h4 id="variational-autoencoders-vae">Variational Autoencoders (VAE)</h4>
+<h3 id="generative-adversarial-networks">Generative adversarial networks</h3>
+<h3 id="self-organizing-map">Self-organizing map</h3>
+<h3 id="deep-belief-nets">Deep Belief Nets</h3>
+<h3 id="hebbian-learning">Hebbian Learning</h3></div>
             <div class="d-none d-xl-block col-xl-2 bd-toc">
                <ul class="section-nav">
                   <li class="toc-entry"><ul>
@@ -235,7 +293,14 @@
 <li><a href="#kernel-density-estimation">Kernel density estimation</a></li>
 </ul></li>
 <li><a href="#anomaly-detection">Anomaly detection</a></li>
-<li><a href="#neural-networks">Neural Networks</a></li>
+<li><a href="#neural-networks">Neural Networks</a>
+<ul>
+<li><a href="#autoencoders">Autoencoders</a></li>
+<li><a href="#generative-adversarial-networks">Generative adversarial networks</a></li>
+<li><a href="#self-organizing-map">Self-organizing map</a></li>
+<li><a href="#deep-belief-nets">Deep Belief Nets</a></li>
+<li><a href="#hebbian-learning">Hebbian Learning</a></li>
+</ul></li>
 </ul></li>
                </ul>
             </div>

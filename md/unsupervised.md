@@ -150,8 +150,73 @@ Gaussian | $\frac{1}{\sqrt{2 \pi}} \exp{(-\frac{u^2}{2})}$
 + Isolation Forest
 
 ## Neural Networks
-+ Autoencoders
-+ Deep Belief Nets
-+ Hebbian Learning
-+ Generative adversarial networks
-+ Self-organizing map
+
+### Autoencoders
+
+An autoencoder is a NN that is tarined to attempts to copy its input to its output. It is composed of two parts:
+
++ The encoding function: $f: \mathcal{X} \rightarrow \mathcal{F}$
++ The decoding function: $g: \mathcal{F} \rightarrow \mathcal{X}$
+
+where $\mathcal{F}$ is the code space.
+
+In fact, an autoencoder is learning the conditionnal distribution $p_{AE}(h|x)$ where $h \in \mathcal{F}$. And we have: $p_{encoder}(h|x) = p_{AE}(h|x)$ and $p_{decoder}(x|h) = p_{AE}(x|h)$. And the loss can be seen as a maximum-likelihood maximization, just like in supervized methods.
+
+#### Vanilla autoencoders
+
++ Undercomplete autoencoder: code space dimension less than the input space.
++ Overcomplete autoencoder : code space dimension greater than the input space.
+
+The learning consists in minimizing a loss function:
+$$
+L(x,g(f(x))) = ||x-g(f(x))||^2
+$$
+
+If $g$ and $f$ are linear, the undercomplete autoencoder is simply learning PCA subspaces ! So non-linear autoencoder can be seen as a non linear generalization of PCA.
+
+#### Regularized autoencoders
+
+If the encoder and the decoder have too much capacity, it is possible that they don't learn anything on the data distribution, but only specific things on the dataset (it is a kind of overfitting). For example, one can imagine an autoencoder which maps $x_i$ to $i$ and $i$ to $x_i$. The learned subset of indexes tells nothing about the data distribution. That's where regularization join the game.
+
+##### Sparse Autoencoders (SAE)
+
+A sparse autoencoder involves a saprsity penalty $\Omega(h)$ on the code layer $f(x)=h$:
+$$
+L(x,g(f(x))) + \Omega(h)
+$$
+
+They are typically used to learn features for other tasks such as classification.
+
+|Regularization therm | $\Omega(h)$ | Remarks
+|--|---|---|
+| KL                  | $\sum_j KL(\rho || \frac{1}{n} \sum_i(h_j(x_i)))$ | $\rho$ is the sparcity parameter, close to zero. This regularization penalizes average activation of the neurones from $h$ on the dataset for deviating from $\rho$, and so force them to be inactive most of the time.
+| $L^1$ and $L^2$ | $\lambda ||h||$ | It is known that these regularizations acheive sparcity.
+
+##### Contractive Autoencoders (CAE)
+
+Another regularization strategy consists in penalizing the gradient:
+$$
+L(x,g(f(x))) + \lambda \sum_i || \nabla_x h_i ||^2
+$$
+
+This forces the model to learn a function that does not changes much when $x$ changes slightly.
+
+#### Denoising Autoencoders (DAE)
+
+A denoising autoencoder minimizes:
+$$
+L(x,g(f(\tilde{x})))
+$$
+
+where $\tilde{x}$ is a copy of $x$ that has been corrupted by some noise.
+
+#### Variational Autoencoders (VAE)
+
+
+### Generative adversarial networks
+
+### Self-organizing map
+
+### Deep Belief Nets
+
+### Hebbian Learning
