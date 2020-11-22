@@ -244,20 +244,52 @@ Here the autoencoder structure appears:
 Lets write the log-marginlikelihood as:
 
 $$
-\log(p_\theta(x)) = \mathbb{E}_{q_\phi(z|x)}(\log(p_\theta(x))) = KL(q_\phi(z|x)||p_\theta(z|x)) + \mathcal{L}(\theta,\phi,x)
+\log(p_\theta(x_i)) = \mathbb{E}_{q_\phi(z|x)}(\log(p_\theta(x_i))) = KL(q_\phi(z|x_i)||p_\theta(z|x_i)) + \mathcal{L}(\theta,\phi,x_i)
 $$
 
 As the KL divergence is non-negative, the second term is called the (variational) lower-bound (by Jensen inequality) of the marginal likelihood. By Jensen inequality we have:
 $$
-\mathcal{L}(\theta,\phi,x) = \mathbb{E}_{q_\phi(z|x)}(-\log(q_\phi(z|x)) + \log(p_\theta(x,z))) = -KL(q_\phi(z|x) || p_\theta(z)) + \mathbb{E}_{q_\phi(z|x)}(\log(p_\theta(x|z)))
+\mathcal{L}(\theta,\phi,x_i) = \mathbb{E}_{q_\phi(z|x_i)}(-\log(q_\phi(z|x_i)) + \log(p_\theta(x_i,z))) = -KL(q_\phi(z|x_i) || p_\theta(z)) + \mathbb{E}_{q_\phi(z|x_i)}(\log(p_\theta(x_i|z)))
 $$
 
+To have an estimator compatible with backpropagation (else, estimating $z$ only by sampling on $q_\phi(z|x_i)$ would prevent backpropagation), we need to introduce a reparametrization of $z$ using a differentiable transformation $g_\phi(\epsilon,x)$ of an auxiliary noise variable $\epsilon$. An estimation od $z$ will then be done by taking $L$ samples from the corresponding distibution:
+$$
+z_{i,l} = g_\phi(\epsilon_{i,l}, x_i) \text{   and   } \epsilon_l \sim p(\epsilon)
+$$
+
+As the $KL$ divergence is often directly integrable, a good estimator for $\mathcal{L}$ is:
+
+$$
+\hat{\mathcal{L}}(\theta, \phi, x_i) = -KL(q_\phi(z|x_i)||p_\theta(z)) + \frac{1}{L} \sum_{l=1}^L \log p_\theta(x_i | z_{i,l})
+$$
+
+And, of course: $\hat{\mathcal{L}} = \sum_i \hat{\mathcal{L}}(\theta, \phi, x_i)$
+
+In VAE, we classicaly suppose that:
 
 + $p_\theta(z) = \mathcal{N}(0,I)$
-+ $p_\theta(x|z) = \mathcal{N}(f_\theta(x), \sigma I)$ ($\sigma$ is an hyperparameter)
++ $q_\phi(z|x_i) = \mathcal{N}(\mu_\phi(x_i), \sigma_\phi^2(x_i) I)$ (multivariate gaussian, with size $J$, where $\mu_\phi$ and $\sigma_\phi$ are the outputs of a gaussian MLP ($\mu(x) = g(h(x)))$ and $\sigma(x) = f(h(x))$ where $f,g,h$ are MLP parametrized by $\theta$)
++ $z_{i,l} = \mu(x_i) + \sigma(x_i) \circ \epsilon_l$  where  $\epsilon_l \sim \mathcal{N}(0,I)$
 
+Then:
+$$
+\hat{\mathcal{L}}(\theta, \phi, x_i) = \frac{1}{2} \sum_j (1 + \log((\sigma_j(x_i))^2) - (\mu_j(x_i))^2 - (\sigma_j(x_i))^2 ) + \frac{1}{L} \sum_{l=1}^L \log p_\theta(x_i | z_{i,l})
+$$
 
+And $p_\theta(x_i | z_{i,l})$ is gaussian or Bernoulli MLP, depending on the type of data modelling.
 
++ $\log p_\theta(x_i | z_{i,l}) = - \frac{1}{2 \sigma_\theta(z_{i,l})} || x_i - \mu_\theta(z_{i,l}) ||^2$ if gaussian
++ $\log p_\theta(x_i | z_{i,l}) = \sum_i x_i \log(f_\theta(z_{i,l})) + (1-x_i) \log(1-f_\theta(z_{i,l}))$  if Bernoulli ($f_\theta$ is a neural network)
+
+#### $\beta$ VAE
+
+In practice the latent-space is often bigger than it could be, to limit this phenomenon one can add a disentangling parameter $\beta$:
+
+$$
+\hat{\mathcal{L}}(\theta, \phi, x_i) = - \beta KL(q_\phi(z|x_i)||p_\theta(z)) + \frac{1}{L} \sum_{l=1}^L \log p_\theta(x_i | z_{i,l})
+$$
+
+if $\beta=0$ we fall back on classical likelihood maximization, if $\beta=1$ the bayesian view of the problem appears. So the parameter $\beta$ represent the learning pressure (it constraint the latent space to be small).
 
 #### Generative adversarial networks (GAN)
 
