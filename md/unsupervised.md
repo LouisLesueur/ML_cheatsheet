@@ -210,10 +210,56 @@ $$
 
 where $\tilde{x}$ is a copy of $x$ that has been corrupted by some noise.
 
-#### Variational Autoencoders (VAE)
+### Variational Autoencoders (VAE)
+
+VAE are a generative model. So the goal is to find the distibution $p_\theta(x)$ of the data.
+To do so, we suppose that the data are built from a latent space (containing the information), unknown and unobserved:
+$$
+p_\theta(x,z) = p_\theta(x|z)p_\theta(z)
+$$
+The corresponding margin-likelihood that we want to maximize is:
+$$
+p_\theta(x) = \int_\mathcal{Z} p_\theta(x|z)p_\theta(z)dz
+$$
+
+As the latent space is unknown, the terms of the integral are approximated by known distributions. But, this integral is most of the time untractable. And there is too much data to use classical estimation technics (Monte-Carlo) to compute it.
+
+Knowing that, the goals of VAE are:
++ Approximaet $\theta$ by ML, to mimic the latent process and generate new artificial data.
++ Approximate $p_\theta(z|x)$ to code data
++ Approximate the marginal inference of $x$ (to perform the same tasks as an autoencoder)
+
+Because of intractabilities, and because of the large dataset, we introduce
+$$
+q_\phi(z|x)
+$$
+Which will approximate $p_\theta(z|x) = p_\theta(x|z)p_\theta(z)/p_\theta(x)$
+
+Here the autoencoder structure appears:
+
++ The latent space can be seen as the autoencoder 'code' space
++ $q_\phi(z|x)$ can be interpreted as a probabilistic encoder
++ $p_\theta(x|z)$ can be interpreted as a probabilistic decoder
+
+Lets write the log-marginlikelihood as:
+
+$$
+\log(p_\theta(x)) = \mathbb{E}_{q_\phi(z|x)}(\log(p_\theta(x))) = KL(q_\phi(z|x)||p_\theta(z|x)) + \mathcal{L}(\theta,\phi,x)
+$$
+
+As the KL divergence is non-negative, the second term is called the (variational) lower-bound (by Jensen inequality) of the marginal likelihood. By Jensen inequality we have:
+$$
+\mathcal{L}(\theta,\phi,x) = \mathbb{E}_{q_\phi(z|x)}(-\log(q_\phi(z|x)) + \log(p_\theta(x,z))) = -KL(q_\phi(z|x) || p_\theta(z)) + \mathbb{E}_{q_\phi(z|x)}(\log(p_\theta(x|z)))
+$$
 
 
-### Generative adversarial networks
++ $p_\theta(z) = \mathcal{N}(0,I)$
++ $p_\theta(x|z) = \mathcal{N}(f_\theta(x), \sigma I)$ ($\sigma$ is an hyperparameter)
+
+
+
+
+#### Generative adversarial networks (GAN)
 
 ### Self-organizing map
 
