@@ -9,6 +9,15 @@ body {
     padding-bottom: 8rem;
 }
 
+img
+{
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  height: 300px;
+}
+
+
 h1,
 h2,
 h3,
