@@ -225,6 +225,7 @@ $$
 As the latent space is unknown, the terms of the integral are approximated by known distributions. But, this integral is most of the time untractable. And there is too much data to use classical estimation technics (Monte-Carlo) to compute it.
 
 Knowing that, the goals of VAE are:
+
 + Approximaet $\theta$ by ML, to mimic the latent process and generate new artificial data.
 + Approximate $p_\theta(z|x)$ to code data
 + Approximate the marginal inference of $x$ (to perform the same tasks as an autoencoder)

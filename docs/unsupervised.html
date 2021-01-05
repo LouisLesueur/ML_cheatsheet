@@ -8,14 +8,14 @@
       
       <title>Unsupervised learning - synthesis</title>
       <!-- Bootstrap -->
-      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+      <link rel="stylesheet" href="css/bootstrap.min.css">
       <!-- Font-awesome -->
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+      <link rel="stylesheet" href="css/font-awesome.min.css">
       <!-- Styles -->
-      <link rel="stylesheet" href="https://ashki23.github.io/styles.css">
+      <link rel="stylesheet" href="css/styles.css">
             <!-- Add favicon here -->
             <!-- Add site-verifications here -->
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.js"></script>
+            <script src="js/katex.min.js"></script>
               <script>document.addEventListener("DOMContentLoaded", function () {
                var mathElements = document.getElementsByClassName("math");
                var macros = [];
@@ -30,8 +30,7 @@
                  });
               }}});
               </script>
-              <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" />
-              <link rel="stylesheet" href="custom.css" />
+              <link rel="stylesheet" href="css/katex.min.css" />
          </head>
    <body>
             <!-- From https://getbootstrap.com/docs/4.5/components/navbar/ -->
@@ -274,7 +273,12 @@ p_\theta(x,z) = p_\theta(x|z)p_\theta(z)
 p_\theta(x) = \int_\mathcal{Z} p_\theta(x|z)p_\theta(z)dz
 </span></p>
 <p>As the latent space is unknown, the terms of the integral are approximated by known distributions. But, this integral is most of the time untractable. And there is too much data to use classical estimation technics (Monte-Carlo) to compute it.</p>
-<p>Knowing that, the goals of VAE are: + Approximaet <span class="math inline">\theta</span> by ML, to mimic the latent process and generate new artificial data. + Approximate <span class="math inline">p_\theta(z|x)</span> to code data + Approximate the marginal inference of <span class="math inline">x</span> (to perform the same tasks as an autoencoder)</p>
+<p>Knowing that, the goals of VAE are:</p>
+<ul>
+<li>Approximaet <span class="math inline">\theta</span> by ML, to mimic the latent process and generate new artificial data.</li>
+<li>Approximate <span class="math inline">p_\theta(z|x)</span> to code data</li>
+<li>Approximate the marginal inference of <span class="math inline">x</span> (to perform the same tasks as an autoencoder)</li>
+</ul>
 <p>Because of intractabilities, and because of the large dataset, we introduce <span class="math display">
 q_\phi(z|x)
 </span> Which will approximate <span class="math inline">p_\theta(z|x) = p_\theta(x|z)p_\theta(z)/p_\theta(x)</span></p>
@@ -313,6 +317,12 @@ z_{i,l} = g_\phi(\epsilon_{i,l}, x_i) \text{   and   } \epsilon_l \sim p(\epsilo
 <li><span class="math inline">\log p_\theta(x_i | z_{i,l}) = - \frac{1}{2 \sigma_\theta(z_{i,l})} || x_i - \mu_\theta(z_{i,l}) ||^2</span> if gaussian</li>
 <li><span class="math inline">\log p_\theta(x_i | z_{i,l}) = \sum_i x_i \log(f_\theta(z_{i,l})) + (1-x_i) \log(1-f_\theta(z_{i,l}))</span> if Bernoulli (<span class="math inline">f_\theta</span> is a neural network)</li>
 </ul>
+<h4 id="beta-vae"><span class="math inline">\beta</span> VAE</h4>
+<p>In practice the latent-space is often bigger than it could be, to limit this phenomenon one can add a disentangling parameter <span class="math inline">\beta</span>:</p>
+<p><span class="math display">
+\hat{\mathcal{L}}(\theta, \phi, x_i) = - \beta KL(q_\phi(z|x_i)||p_\theta(z)) + \frac{1}{L} \sum_{l=1}^L \log p_\theta(x_i | z_{i,l})
+</span></p>
+<p>if <span class="math inline">\beta=0</span> we fall back on classical likelihood maximization, if <span class="math inline">\beta=1</span> the bayesian view of the problem appears. So the parameter <span class="math inline">\beta</span> represent the learning pressure (it constraint the latent space to be small).</p>
 <h4 id="generative-adversarial-networks-gan">Generative adversarial networks (GAN)</h4>
 <h3 id="self-organizing-map">Self-organizing map</h3>
 <h3 id="deep-belief-nets">Deep Belief Nets</h3>
@@ -370,12 +380,9 @@ z_{i,l} = g_\phi(\epsilon_{i,l}, x_i) \text{   and   } \epsilon_l \sim p(\epsilo
             </footer>
             <!-- Add global site tag (gtag.js) and site analytics here -->
             <!-- JS, Popper.js, and jQuery -->
-      <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-      <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
-      <!-- Mathjax -->
-      <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-      <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="js/jquery-3.5.1.slim.min.js" ></script>
+      <script src="js/popper.min.js" ></script>
+      <script src="js/bootstrap.min.js" ></script>
       <script>
          /* Bootstrap styles to tables */
          function bootstrapStylePandocTables() {
