@@ -2,6 +2,7 @@ SOURCES = \
 	index \
 	reinforcement \
 	unsupervised \
+	graphical \
 
 BUILDDIR = docs/
 TARGETS = $(addprefix $(BUILDDIR),$(addsuffix .html,$(SOURCES)))

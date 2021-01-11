@@ -6,7 +6,7 @@
       <meta name="generator" content="pandoc">
       <meta name="author" content="Louis Lesueur">
       
-      <title>Reinforcement learning - synthesis</title>
+      <title>ML woth graphical models - synthesis</title>
       <!-- Bootstrap -->
       <link rel="stylesheet" href="css/bootstrap.min.css">
       <!-- Font-awesome -->
@@ -55,7 +55,82 @@
 
             </nav>
             <div class="container">
-         <h1 class="title">Reinforcement learning - synthesis</h1>
+         <h1 class="title">ML woth graphical models - synthesis</h1>
+                  <div class="row">
+            <div class="col-xl-10"><h1 id="this-is-a-work-in-progress">THIS IS A WORK IN PROGRESS</h1>
+<h2 id="definitions">Definitions</h2>
+<p>Graphical models are usefull when the output set is structured (ex: connected body parts on a picture, grammatical functions in a sentence…).</p>
+<p>There are several types of graphical models to do that:</p>
+<ul>
+<li>Directed models : Bayesian networks (BN)</li>
+<li>Undirected models: Markov Random Fields (MRF)</li>
+<li>Other : chain graphs, influence diagrams…</li>
+</ul>
+<p>The graph encodes conditional independance assumptions:</p>
+<p><span class="math display">
+p(y_i | y_{V \ {i}}) = p(y_i | y_{N(i)})
+</span></p>
+<h2 id="factor-graphs">Factor graphs</h2>
+<p>Both directed and undirected models can be represented by factor graphs with:</p>
+<ul>
+<li>variable nodes <span class="math inline">V</span> (represented by circles)</li>
+<li>factor nodes <span class="math inline">\mathcal{F}</span> (represented by boxes)</li>
+<li>edges <span class="math inline">\mathcal{E}</span> between factors and variables</li>
+<li>a factor <span class="math inline">F \in \mathcal{F}</span> connects a subset of nodes, noted <span class="math inline">y_F</span></li>
+</ul>
+<p>a factor graph represents a factorization of the type:</p>
+<p><span class="math display">
+p(y) = \frac{1}{Z} \prod_{F \in \mathcal{F}} \psi_F(y_F)
+</span></p>
+<p>where <span class="math inline">\psi</span> are “potentials” defined on factors, and <span class="math inline">Z</span> is a normalization constant, called the “partition function”:</p>
+<p><span class="math display">
+Z = \sum_{y \in \mathcal{Y}} \prod_{F \in \mathcal{F}} \psi_F(y_F)
+</span></p>
+<h3 id="conditional-distributions">Conditional distributions</h3>
+<p>To add the fact that outputs in <span class="math inline">\mathcal{Y}</span> are conditioned by inputs in <span class="math inline">\mathcal{X}</span>, potentials becom also function of <span class="math inline">x</span>:</p>
+<p><span class="math display">
+p(y | x) = \frac{1}{Z(x)} \prod_{F \in \mathcal{F}} \psi_F(y_F, x_F)
+</span></p>
+<p>and:</p>
+<p><span class="math display">
+Z(x) = \sum_{y \in \mathcal{Y}} \prod_{F \in \mathcal{F}} \psi_F(y_F, x_F)
+</span></p>
+<h3 id="energy">Energy</h3>
+<p>When the potentials are positive, reasoning in term of “energy” is more conveniant for minimization (see next):</p>
+<p><span class="math display">
+E_F(y_F, x_F) = - \log (\psi_F(x_F, y_F))
+</span></p>
+<p>and:</p>
+<p><span class="math display">
+E(x,y) = \sum_{F \in \mathcal{F}} E_F(y_F, x_F)
+</span></p>
+<h2 id="inferences-on-factor-graphs">Inferences on factor graphs</h2>
+<p>When <span class="math inline">p(y|x)</span> is known (ie, when an expression of the energy is known), predict <span class="math inline">f: \mathcal{X} \rightarrow \mathcal{Y}</span> can be done by MAP:</p>
+<p><span class="math display">
+\hat{y} = \argmax_{y \in \mathcal{Y}} p(y | x) =  \argmin_{y \in \mathcal{Y}} E(y,x)
+</span></p>
+<h3 id="belief-propagation">Belief propagation</h3>
+<p>To solve the minimization problem, one need to compute <span class="math inline">p(y|x)</span> for any <span class="math inline">y \in \mathcal{Y}</span>, and so <span class="math inline">Z(x)</span> which is very expensive. When graphs are small it can be done by hand (variable elimination), else Belief propagation is the most common method.</p></div>
+            <div class="d-none d-xl-block col-xl-2 bd-toc">
+               <ul class="section-nav">
+                  <li class="toc-entry"><ul>
+<li><a href="#this-is-a-work-in-progress">THIS IS A WORK IN PROGRESS</a>
+<ul>
+<li><a href="#definitions">Definitions</a></li>
+<li><a href="#factor-graphs">Factor graphs</a>
+<ul>
+<li><a href="#conditional-distributions">Conditional distributions</a></li>
+<li><a href="#energy">Energy</a></li>
+</ul></li>
+<li><a href="#inferences-on-factor-graphs">Inferences on factor graphs</a>
+<ul>
+<li><a href="#belief-propagation">Belief propagation</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+               </ul>
+            </div>
+         </div>
                </div>
             <!-- Add comment hosting service here -->
             <!-- Footer -->

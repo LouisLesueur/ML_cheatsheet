@@ -3,25 +3,40 @@ title: Supervised learning - synthesis
 author: Louis Lesueur
 ---
 
+
+## Global ML process
+
+1. Model the domain problem as a joint distribution (ie, define random variables).
+2. Build a model and learn its parameters using MLE or MAP estimation
+3. Use the model to make inferences
+
 ## Data representation
 
-### Definitions
+### Definitions for supervised learning
 
-+ $X$: real random vector taking values in $\mathcal{X}$
-+ $Y$: real random vector taking values in $\mathcal{Y}$
-  + For a regression problem: $\mathcal{Y}=\mathbb{R}$
++ $X$: real random vector taking values in $\mathcal{X}$ modeling the 'inputs'
++ $Y$: real random vector taking values in $\mathcal{Y}$ modeling the 'outputs'
+  + For a regression problem: $\mathcal{Y}=\mathbb{R}^m$
   + For a classification problem: $\mathcal{Y} = \{C_k \}_{k<K}$ ($K$ classes)
+  + For more complex promblems, $\mathcal{Y}$ can be modeled by a probabilistic graph (cf gaphical models part)
 + $p_{XY}$ joint distribution of $(X,Y)$, unknown
 
-### Pre-treatments
-
-For a dataset $\mathcal{X}_n$, composed of $n$ samples from $X$ we note:
+For a dataset composed of $n$ samples from $X$ (rep $Y$) we note:
 
 + $x$ the dataset
 + $x_i$ the $i$-th sample
-+ $x_i^{(j)}$ the $j$-th feature of the $i$-th sample
++ $x_i^{(j)}$ the $j$-th feature of the $i$-th sample of the
 
-Several pre-treatments can be applied:
+
+In Supervised Learning, we have a labelized sample $\mathcal{D}_n = \{(x_i, y_i) \in \mathcal{X}\times\mathcal{Y}\}$, from $p_{XY}$. When a new sample $x_t$ is drawn from $X$, we make the assumption that $y_t$ can be estimated by a function $f$:
+
+$$
+\hat{y_t} = f(x_t) + \epsilon
+$$
+
+with $\epsilon$ iid zero mean noise.
+
+### Pre-treatments
 
 #### One-Hot encoding
 
@@ -70,17 +85,11 @@ Finally, if the dataset dimension is too big, the optimization will be slow beca
 
 ## Loss and risk functions
 
-In Machine Learning, we make assumption on data:
 
-$$
-Y = f(X) + \epsilon
-$$
-
-with $\epsilon$ iid zero mean noise.
 
 The goal is to estimate $f$, to do so let introduce:
 
-+ Loss function $L(y,y_{pred})$: measure the error of the predictor.
++ Loss function $L(y,\hat{y})$: measure the error of the predictor.
 + Risk function $R(f) = \mathbb{E}_{XY}(L(Y,f(X))) = \mathbb{E}_{X}(\mathbb{E}_{Y|X}(L(Y,f(X)) | X))$
 
 
@@ -92,7 +101,7 @@ $$
 
 ## Discriminative models
 
-In discriminative problems, we have a labelized sample $\mathcal{D}_n = \{(x_i, y_i) \in \mathcal{X}\times\mathcal{Y}\}$, from $p_{XY}$, and we want to directly determine $p(y | x)$
+In discriminative problems, we want to directly determine $p(y | x)$, ie to find a good estimate of $f$.
 
 
 Let's introduce empirical risk function: $R_{emp}(f, \mathcal{D}_n) = \frac{1}{n} \sum_i L(y_i, f(x_i))$, an estimator of $R(f)$
@@ -626,16 +635,3 @@ To see if a model is robust, using only a training and a test isn't sufficient, 
 + add a validation set (if enough data): the idea is to train the model on the train set, to tune hyperparameters by looking at the validation error (to detect overfitting) and to finally validate the model by looking at its performances on the test set.
 
 + cross validation: the principle of cross validation is to create several bipartitions of the dataset and to train/test it on each of these partitions.
-
-## Generative models
-
-+ naive Bayes classifier
-
-## Graphical models
-
-+ Bayesian network
-+ Hidden Markov model
-+ Markov random field
-+ linear discriminant analysis
-+ Gaussian Mixture Model
-+ Restricted Boltzmann machine
