@@ -1,4 +1,4 @@
----
+--- 
 title: Supervised learning - synthesis
 author: Louis Lesueur
 ---
@@ -172,16 +172,15 @@ where:
 
 ##### Linear case
 
-Here the model are linear, $f_\theta(x) = \theta^Tx$. For this kind of mdel, Fenchel duality can be used to simply express the dual problem, which can be exploited for the kernel trick.
+Here the model are linear, $f_\theta(x) = \theta^Tx$. By adding the constraint $\frac{1}{n} \zeta_i = \theta^T x_i$ and minimizing over $(\zeta, \theta)$, the dual problem can easily be extracted.
 
 |Primal                                                   | Dual                                                                                            |
 |---------------------------------------------------------|-------------------------------------------------------------------------------------------------|
-|$\min_\theta \frac{1}{n} \sum_{i=1}^{n} L(y_i, \theta^Tx_i) + C(\theta)$|$\max_\alpha \frac{1}{n} \sum_{i=1}^{n} -L^{\#}(y_i,-\alpha_i ) - C^{\#}(\sum_{i=1}^{n} \alpha_i x_i)$|
+|$\min_\theta \frac{1}{n} \sum_{i=1}^{n} L(y_i, \theta^Tx_i) + \lambda C(\theta)$|$\max_\alpha \frac{1}{n} \sum_{i=1}^{n} -L^{\#}(y_i,-\alpha_i ) - \lambda C^{\#}( \frac{1}{n \lambda} \sum_{i=1}^{n} \alpha_i x_i)$|
 
-Where $L^\#$ and $C^\#$ are the convex conjugate of $L$ (for the second variable) and $C$ (defined by $f^\#(a) = \max_z (za - f(z))$).
-And $x_i^\#(\cdot)$ is the adjoint operator of $(\cdot^Tx_i)$ (${\theta^T}^\# = \overline{\theta}$)
+Where $L^\#$ and $C^\#$ are the convex conjugates of $L$ (for the second variable) and $C$ 
 
-It can be shown that if $\hat{\theta}$ and $\hat{\alpha}$ are the optimal solutions of those problems, then we have:
+It can be shown that if $\hat{\theta}$ and $\hat{\alpha}$ are the optimal solutions of those problems most of the time strong duality implies that:
 $$
 P(\hat{\theta}) = P(\theta(\hat{\alpha})) = D(\hat{\alpha})
 $$
@@ -330,12 +329,12 @@ $$
 
 ##### Regularizations
 
-|Name | $C(w)$ | properties |
-|----------|--------|-------------------|
-|$L^2$| $||w||^2_2$ | strictly convex (1 solution), differentiable, but relies on all features (dense solution)
-|$L^1$| $||w||_1$ | convex, not differentiable, but performs feature selection (sparse solution)
-|Elastic net| $\alpha ||w||_1 + (1-\alpha)||w||^2_2$ | strictly convex, not differentialbe
-|$L^p$ (often $0<p<1$)| $||w||_p$ |non convex, very sparse solutions, initialization dependant, not differentiable
+|Name | $C(w)$ | $C^\#(a)$ | properties |
+|----------|-----------------|-----------------|-------------|
+|$L^2$| $\frac{1}{2} ||w||^2_2$ | $\frac{1}{2} ||w||^2_2$ (the $\frac{1}{2}$ factor is important !)  | strictly convex (1 solution), differentiable, but relies on all features (dense solution)
+|$L^1$| $||w||_1$ |    |convex, not differentiable, but performs feature selection (sparse solution)
+|Elastic net| $\alpha ||w||_1 + (1-\alpha)||w||^2_2$ | $0$ if $||a||_{\infty} \leq 1$, $- \infty$ else | strictly convex, not differentialbe
+|$L^p$ (often $0<p<1$)| $||w||_p$ |  |non convex, very sparse solutions, initialization dependant, not differentiable
 
 
 ##### Focus on linear regression
@@ -496,8 +495,18 @@ $$
 $$
 
 
+##### Classical CNN architectures
 
 #### RNN
+
+#### Regularization for neural networks
+
++ Dropouts: zeros the activation values of randomly chosen neurons during training. This forces the network to learn more robust features.
+
++ Batch normalization 
+
++ Transfer learning: start from an already trained network on another dataset, and only retrain last neurons
+
 
 
 ### Model Performance assessment, and model selection

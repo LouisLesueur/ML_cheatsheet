@@ -186,7 +186,7 @@ R(f_\theta) - R(f^*) = \text{KL}(p_\theta, p^*)
 <li><span class="math inline">C</span> is a regularization function and <span class="math inline">\lambda</span> a regularization factor</li>
 </ul>
 <h5 id="linear-case">Linear case</h5>
-<p>Here the model are linear, <span class="math inline">f_\theta(x) = \theta^Tx</span>. For this kind of mdel, Fenchel duality can be used to simply express the dual problem, which can be exploited for the kernel trick.</p>
+<p>Here the model are linear, <span class="math inline">f_\theta(x) = \theta^Tx</span>. By adding the constraint <span class="math inline">\frac{1}{n} \zeta_i = \theta^T x_i</span> and minimizing over <span class="math inline">(\zeta, \theta)</span>, the dual problem can easily be extracted.</p>
 <table>
 <colgroup>
 <col style="width: 37%" />
@@ -200,13 +200,13 @@ R(f_\theta) - R(f^*) = \text{KL}(p_\theta, p^*)
 </thead>
 <tbody>
 <tr class="odd">
-<td><span class="math inline">\min_\theta \frac{1}{n} \sum_{i=1}^{n} L(y_i, \theta^Tx_i) + C(\theta)</span></td>
-<td><span class="math inline">\max_\alpha \frac{1}{n} \sum_{i=1}^{n} -L^{\#}(y_i,-\alpha_i ) - C^{\#}(\sum_{i=1}^{n} \alpha_i x_i)</span></td>
+<td><span class="math inline">\min_\theta \frac{1}{n} \sum_{i=1}^{n} L(y_i, \theta^Tx_i) + \lambda C(\theta)</span></td>
+<td><span class="math inline">\max_\alpha \frac{1}{n} \sum_{i=1}^{n} -L^{\#}(y_i,-\alpha_i ) - \lambda C^{\#}( \frac{1}{n \lambda} \sum_{i=1}^{n} \alpha_i x_i)</span></td>
 </tr>
 </tbody>
 </table>
-<p>Where <span class="math inline">L^\#</span> and <span class="math inline">C^\#</span> are the convex conjugate of <span class="math inline">L</span> (for the second variable) and <span class="math inline">C</span> (defined by <span class="math inline">f^\#(a) = \max_z (za - f(z))</span>). And <span class="math inline">x_i^\#(\cdot)</span> is the adjoint operator of <span class="math inline">(\cdot^Tx_i)</span> (<span class="math inline">{\theta^T}^\# = \overline{\theta}</span>)</p>
-<p>It can be shown that if <span class="math inline">\hat{\theta}</span> and <span class="math inline">\hat{\alpha}</span> are the optimal solutions of those problems, then we have: <span class="math display">
+<p>Where <span class="math inline">L^\#</span> and <span class="math inline">C^\#</span> are the convex conjugates of <span class="math inline">L</span> (for the second variable) and <span class="math inline">C</span></p>
+<p>It can be shown that if <span class="math inline">\hat{\theta}</span> and <span class="math inline">\hat{\alpha}</span> are the optimal solutions of those problems most of the time strong duality implies that: <span class="math display">
 P(\hat{\theta}) = P(\theta(\hat{\alpha})) = D(\hat{\alpha})
 </span></p>
 <h5 id="the-kernel-trick-for-non-linear-models">The kernel trick for non-linear models</h5>
@@ -531,36 +531,42 @@ l(\theta) = \sum_{i=0}^n \ln( \prod_{l=1}^k \frac{e^{\theta_l^T x_i}}{\sum_{j=1}
 <h5 id="regularizations">Regularizations</h5>
 <table>
 <colgroup>
-<col style="width: 27%" />
-<col style="width: 21%" />
-<col style="width: 51%" />
+<col style="width: 17%" />
+<col style="width: 29%" />
+<col style="width: 29%" />
+<col style="width: 22%" />
 </colgroup>
 <thead>
 <tr class="header">
 <th>Name</th>
 <th><span class="math inline">C(w)</span></th>
+<th><span class="math inline">C^\#(a)</span></th>
 <th>properties</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td><span class="math inline">L^2</span></td>
-<td><span class="math inline">||w||^2_2</span></td>
+<td><span class="math inline">\frac{1}{2} ||w||^2_2</span></td>
+<td><span class="math inline">\frac{1}{2} ||w||^2_2</span> (the <span class="math inline">\frac{1}{2}</span> factor is important !)</td>
 <td>strictly convex (1 solution), differentiable, but relies on all features (dense solution)</td>
 </tr>
 <tr class="even">
 <td><span class="math inline">L^1</span></td>
 <td><span class="math inline">||w||_1</span></td>
+<td></td>
 <td>convex, not differentiable, but performs feature selection (sparse solution)</td>
 </tr>
 <tr class="odd">
 <td>Elastic net</td>
 <td><span class="math inline">\alpha ||w||_1 + (1-\alpha)||w||^2_2</span></td>
+<td><span class="math inline">0</span> if <span class="math inline">||a||_{\infty} \leq 1</span>, <span class="math inline">- \infty</span> else</td>
 <td>strictly convex, not differentialbe</td>
 </tr>
 <tr class="even">
 <td><span class="math inline">L^p</span> (often <span class="math inline">0&lt;p&lt;1</span>)</td>
 <td><span class="math inline">||w||_p</span></td>
+<td></td>
 <td>non convex, very sparse solutions, initialization dependant, not differentiable</td>
 </tr>
 </tbody>
@@ -734,7 +740,14 @@ f_{NN} = (f_1 \circ f_2 \ldots \circ f_L) \circ (pool_K \circ conv_K \circ \ldot
 <p><span class="math display">
 \frac{\partial C}{\partial \text{filter}(x,y)} = \sum_i \sum_j \frac{\partial C}{\partial o(i,j)} \text{image}(i,j)
 </span></p>
+<h5 id="classical-cnn-architectures">Classical CNN architectures</h5>
 <h4 id="rnn">RNN</h4>
+<h4 id="regularization-for-neural-networks">Regularization for neural networks</h4>
+<ul>
+<li><p>Dropouts: zeros the activation values of randomly chosen neurons during training. This forces the network to learn more robust features.</p></li>
+<li><p>Batch normalization</p></li>
+<li><p>Transfer learning: start from an already trained network on another dataset, and only retrain last neurons</p></li>
+</ul>
 <h3 id="model-performance-assessment-and-model-selection">Model Performance assessment, and model selection</h3>
 <h4 id="bias-variance-tradeoff">Bias-variance tradeoff</h4>
 <p>Model selection consists in optimizing a model family or canditates (tuning the hyperparameters) To perform model selection, the dataset <span class="math inline">\mathcal{D}_n</span> is splitted in three subsets:</p>
