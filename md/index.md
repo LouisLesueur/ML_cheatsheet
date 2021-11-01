@@ -1,5 +1,5 @@
 --- 
-title: Supervised learning - synthesis
+title: Supervised learning - synthesis 
 author: Louis Lesueur
 ---
 
@@ -433,6 +433,20 @@ and: $f_l(a) = \sigma_l(w^{(l)} a)$, with $\sigma$ an activation function (cf ta
 
 ##### Backpropagation
 
+Before going into details, here is a useful computation. For $L(y)$ with $y=w^Tx$ where $w$ is a matrix and $x$, $y$ are vectors, and L is a vector to scalar function (typically a loss function):
+
+$$
+\frac{\partial L}{\partial w_{ij}} = \frac{\partial L}{\partial y} \frac{\partial y}{\partial w_{ij}} = \frac{\partial L}{\partial y_i} x_j 
+$$
+
+Hence:
+
+$$
+\frac{\partial L}{\partial w} = \frac{\partial L}{\partial y}^T x^T
+$$
+
+This identity will be useful for the computation of gradients according to the weights.
+
 To train a MLP, we use a classic loss function and a gradient descent. But, as the global expression is complicated, we will use properties from the chain rule to compute partial derivatives and apply backpropagation to them.
 
 Notations:
@@ -443,13 +457,13 @@ Notations:
 
 We have:
 $$
-\frac{\partial C}{\partial w^{(l)}} = \frac{\partial C}{\partial z^{(l)}} \frac{\partial z^{(l)}}{\partial w^{(l)}} = \frac{\partial C}{\partial z^{(l)}} {a^{(l-1)}}^T
+\frac{\partial C}{\partial w^{(l)}} = \frac{\partial C}{\partial z^{(l)}}^T {a^{(l-1)}}^T
 $$
 
 But:
 
 $$
-\frac{\partial C}{\partial z^{(l)}} = \frac{\partial C}{\partial z^{(l+1)}} \frac{\partial z^{(l+1)}}{\partial a^{(l)}} \frac{\partial a^{(l)}}{\partial z^{(l)}} = ({w^{(l+1)}}^T \frac{\partial C}{\partial z^{(l+1)}}) \sigma '(z^{(l)})
+\frac{\partial C}{\partial z^{(l)}} = \frac{\partial C}{\partial z^{(l+1)}} \frac{\partial z^{(l+1)}}{\partial a^{(l)}} \frac{\partial a^{(l)}}{\partial z^{(l)}} = \frac{\partial C}{\partial z^{(l+1)}} {w^{(l+1)}}^T \sigma '(z^{(l)})
 $$
 
 And:

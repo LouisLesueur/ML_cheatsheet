@@ -697,6 +697,15 @@ f_{NN} = f_1 \circ f_2 \ldots f_L
 </tbody>
 </table>
 <h5 id="backpropagation">Backpropagation</h5>
+<p>Before going into details, here is a useful computation. For <span class="math inline">L(y)</span> with <span class="math inline">y=w^Tx</span> where <span class="math inline">w</span> is a matrix and <span class="math inline">x</span>, <span class="math inline">y</span> are vectors, and L is a vector to scalar function (typically a loss function):</p>
+<p><span class="math display">
+\frac{\partial L}{\partial w_{ij}} = \frac{\partial L}{\partial y} \frac{\partial y}{\partial w_{ij}} = \frac{\partial L}{\partial y_i} x_j 
+</span></p>
+<p>Hence:</p>
+<p><span class="math display">
+\frac{\partial L}{\partial w} = \frac{\partial L}{\partial y}^T x^T
+</span></p>
+<p>This identity will be useful for the computation of gradients according to the weights.</p>
 <p>To train a MLP, we use a classic loss function and a gradient descent. But, as the global expression is complicated, we will use properties from the chain rule to compute partial derivatives and apply backpropagation to them.</p>
 <p>Notations:</p>
 <ul>
@@ -705,11 +714,11 @@ f_{NN} = f_1 \circ f_2 \ldots f_L
 <li><span class="math inline">z^{(l)} = w^{(l)} a^{(l-1)}</span></li>
 </ul>
 <p>We have: <span class="math display">
-\frac{\partial C}{\partial w^{(l)}} = \frac{\partial C}{\partial z^{(l)}} \frac{\partial z^{(l)}}{\partial w^{(l)}} = \frac{\partial C}{\partial z^{(l)}} {a^{(l-1)}}^T
+\frac{\partial C}{\partial w^{(l)}} = \frac{\partial C}{\partial z^{(l)}}^T {a^{(l-1)}}^T
 </span></p>
 <p>But:</p>
 <p><span class="math display">
-\frac{\partial C}{\partial z^{(l)}} = \frac{\partial C}{\partial z^{(l+1)}} \frac{\partial z^{(l+1)}}{\partial a^{(l)}} \frac{\partial a^{(l)}}{\partial z^{(l)}} = ({w^{(l+1)}}^T \frac{\partial C}{\partial z^{(l+1)}}) \sigma &#39;(z^{(l)})
+\frac{\partial C}{\partial z^{(l)}} = \frac{\partial C}{\partial z^{(l+1)}} \frac{\partial z^{(l+1)}}{\partial a^{(l)}} \frac{\partial a^{(l)}}{\partial z^{(l)}} = \frac{\partial C}{\partial z^{(l+1)}} {w^{(l+1)}}^T \sigma &#39;(z^{(l)})
 </span></p>
 <p>And: <span class="math display">
 \frac{\partial C}{\partial z^{(L)}} = \frac{\partial C}{\partial a^{(L)}} \sigma &#39;(z^{(L)})
